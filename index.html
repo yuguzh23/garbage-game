@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light}body{margin:0;font:14px system-ui}[hidden]{display:none!important}</style>
+<html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><style>:root{color-scheme:light}body{margin:0;font:14px system-ui}[hidden]{display:none!important}</style>
 <script src="config.js"></script></head>
 <body>
 <title>垃圾分類大挑戰</title>
@@ -40,6 +40,8 @@
   color-scheme: dark;
 }
 * { box-sizing: border-box; }
+html, body { touch-action: pan-x pan-y; -webkit-tap-highlight-color: transparent; }
+button { touch-action: manipulation; -webkit-user-select: none; user-select: none; }
 body {
   background: var(--bg); color: var(--ink); font-family: var(--font-body); font-size: 20px; line-height: 1.6;
   padding-left: max(16px, env(safe-area-inset-left, 0px));
@@ -226,6 +228,8 @@ a.link { color: var(--accent); font-size: 20px; }
 <script>
 (function () {
   'use strict';
+  // no zoom from double-tap or pinch on tablets (iOS Safari ignores user-scalable)
+  ['gesturestart', 'gesturechange', 'gestureend'].forEach(function (ev) { document.addEventListener(ev, function (e) { e.preventDefault(); }); });
   var K = '#1b1b1b';
   var SW = 'stroke="' + K + '" stroke-width="5" stroke-linejoin="round" stroke-linecap="round"';
   function arrows(col, w) {
