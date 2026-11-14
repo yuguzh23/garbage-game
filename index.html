@@ -1,0 +1,1132 @@
+<!doctype html>
+<html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light}body{margin:0;font:14px system-ui}[hidden]{display:none!important}</style>
+<script src="config.js"></script></head>
+<body>
+<title>垃圾分類大挑戰</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bpmf+Huninn&display=swap">
+<style>
+/* Layout: tablet = status bar, one play area, big answer buttons; teacher board (#board) = settings strip + ranked score bars.
+   Palette follows the lesson deck: soft grey-green ground, leaf green, sky blue, amber. */
+:root {
+  --bg: #ecece8;
+  --surface: #fbfbf8;
+  --ink: #23302a;
+  --ink2: #4a5a50;
+  --line: #d3d6cd;
+  --accent: #4f7a14;
+  --on-accent: #ffffff;
+  --good: #2b7a38;
+  --bad: #b3362a;
+  --stage: #ffffff;
+  --focus: #2b6fc4;
+  --bin-recycle: #2b6fc4;
+  --bin-food: #b45f06;
+  --bin-trash: #5b6470;
+  --font-body: 'Bpmf Huninn', 'Noto Sans TC', 'PingFang TC', 'Microsoft JhengHei', sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #131b16; --surface: #1e2922; --ink: #eef2ec; --ink2: #b7c4ba; --line: #33423a;
+    --accent: #a8c85a; --on-accent: #10200a; --good: #6fcf7f; --bad: #ff8a78; --stage: #f3f1ea; --focus: #8db8ff;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #131b16; --surface: #1e2922; --ink: #eef2ec; --ink2: #b7c4ba; --line: #33423a;
+  --accent: #a8c85a; --on-accent: #10200a; --good: #6fcf7f; --bad: #ff8a78; --stage: #f3f1ea; --focus: #8db8ff;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body {
+  background: var(--bg); color: var(--ink); font-family: var(--font-body); font-size: 20px; line-height: 1.6;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 16px;
+}
+h1, h2, h3, p { margin: 0; }
+button { font: inherit; color: inherit; cursor: pointer; }
+:focus-visible { outline: 4px solid var(--focus); outline-offset: 3px; }
+.app { display: flex; flex-direction: column; gap: 18px; min-height: calc(100dvh - 32px - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px)); max-width: 1280px; margin: 0 auto; }
+main { flex: 1; display: flex; flex-direction: column; gap: 18px; min-width: 0; }
+
+/* top bar */
+.top { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+.chip { color: #fff; border-radius: 999px; padding: 6px 22px; font-size: 26px; white-space: nowrap; }
+.score { background: var(--surface); border: 2px solid var(--line); border-radius: 999px; padding: 6px 22px; font-size: 24px; }
+.score b { font-size: 34px; font-weight: 400; color: var(--accent); }
+.gamepill { background: var(--surface); border: 2px solid var(--line); border-radius: 999px; padding: 6px 18px; font-size: 22px; }
+.grow { flex: 1; }
+.status { font-size: 18px; color: var(--ink2); }
+.btn-sm { background: var(--surface); border: 2px solid var(--line); border-radius: 14px; padding: 6px 16px; font-size: 18px; min-height: 44px; }
+.btn-big { background: var(--accent); color: var(--on-accent); border: none; border-radius: 22px; padding: 14px 40px; font-size: 34px; min-height: 72px; }
+.btn-ghost { background: transparent; color: var(--ink); border: 3px solid var(--line); border-radius: 22px; padding: 12px 28px; font-size: 26px; min-height: 64px; }
+.coopbar { display: flex; align-items: center; gap: 14px; background: var(--surface); border: 2px solid var(--line); border-radius: 18px; padding: 6px 16px; font-size: 20px; }
+.track { flex: 1; height: 18px; border-radius: 999px; background: var(--line); overflow: hidden; }
+.track i { display: block; height: 100%; background: var(--accent); border-radius: 999px; transition: width .4s ease; }
+
+/* centered screens */
+.center { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 20px; text-align: center; padding: 12px 0; }
+.center h1 { font-size: clamp(44px, 8vw, 84px); font-weight: 400; line-height: 1.3; }
+.center .sub { font-size: clamp(22px, 3vw, 30px); color: var(--ink2); max-width: 28em; }
+.pill { background: var(--surface); border: 2px solid var(--line); border-radius: 999px; padding: 4px 22px; font-size: 24px; color: var(--ink2); }
+
+/* setup */
+.setup { display: flex; flex-direction: column; gap: 22px; }
+.setup h1 { font-size: clamp(36px, 6vw, 60px); font-weight: 400; line-height: 1.3; }
+.setup h2 { font-size: 28px; font-weight: 400; }
+.groups { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+.gbtn { color: #fff; border: 5px solid transparent; border-radius: 20px; min-height: 78px; font-size: 30px; }
+.gbtn[aria-pressed="true"] { border-color: var(--ink); box-shadow: 0 0 0 4px var(--bg), 0 0 0 8px var(--ink); }
+.stepper { display: flex; align-items: center; gap: 16px; }
+.stepper button { width: 64px; height: 64px; border-radius: 18px; border: 3px solid var(--line); background: var(--surface); font-size: 34px; }
+.stepper output { font-size: 44px; min-width: 64px; text-align: center; }
+.names { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 10px; }
+.names input { font: inherit; font-size: 24px; padding: 10px 14px; border-radius: 14px; border: 3px solid var(--line); background: var(--surface); color: var(--ink); min-width: 0; width: 100%; }
+.row { display: flex; flex-wrap: wrap; gap: 14px; align-items: center; }
+.note { font-size: 18px; color: var(--ink2); max-width: 60ch; }
+a.link { color: var(--accent); font-size: 20px; }
+.seg { border: 3px solid var(--line); background: var(--surface); border-radius: 14px; padding: 6px 16px; font-size: 22px; min-height: 52px; }
+.seg[aria-pressed="true"] { background: var(--accent); color: var(--on-accent); border-color: var(--accent); }
+
+/* play: shared */
+.hint { text-align: center; font-size: clamp(26px, 4vw, 38px); }
+.hint small { display: block; font-size: 20px; color: var(--ink2); }
+.stage { flex: 1; display: grid; place-items: center; min-height: 0; }
+.itemcard { background: var(--stage); color: #23302a; border-radius: 32px; padding: 18px 40px 22px; display: flex; flex-direction: column; align-items: center; gap: 4px; touch-action: none; cursor: grab; user-select: none; -webkit-user-select: none; box-shadow: 0 10px 0 rgba(0,0,0,.12); transition: transform .2s ease; }
+.itemcard.drag { cursor: grabbing; transition: none; box-shadow: 0 22px 30px rgba(0,0,0,.28); z-index: 5; position: relative; }
+.itemcard.still { cursor: default; touch-action: auto; }
+.itemcard svg { width: clamp(150px, 28vh, 270px); height: clamp(150px, 28vh, 270px); pointer-events: none; }
+.itemcard .nm { font-size: clamp(30px, 5vw, 50px); text-align: center; pointer-events: none; }
+.bins { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+.bin { border: 6px solid transparent; border-radius: 26px; color: #fff; min-height: clamp(120px, 21vh, 190px); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; font-size: clamp(26px, 3.6vw, 42px); padding: 10px 8px; min-width: 0; overflow-wrap: anywhere; }
+.ic { width: clamp(52px, 9vh, 84px); height: clamp(52px, 9vh, 84px); background: #fff; border-radius: 50%; display: grid; place-items: center; flex: none; }
+.ic svg { width: 78%; height: 78%; }
+.bin.hot { border-color: #fff; box-shadow: 0 0 0 6px var(--ink); transform: scale(1.03); }
+.bin:disabled { cursor: default; opacity: .55; }
+.bin.right { opacity: 1; border-color: #fff; box-shadow: 0 0 0 6px var(--good); }
+.b-recycle { background: var(--bin-recycle); } .b-food { background: var(--bin-food); } .b-trash { background: var(--bin-trash); }
+.tag { color: #fff; border-radius: 14px; padding: 2px 16px; white-space: nowrap; }
+
+/* belt */
+.timebar { height: 16px; border-radius: 999px; background: var(--line); overflow: hidden; }
+.timebar i { display: block; height: 100%; background: var(--accent); width: 100%; }
+.lane { position: relative; height: clamp(180px, 27vh, 230px); background: var(--surface); border: 3px solid var(--line); border-radius: 26px; }
+.lane::before { content: ""; position: absolute; left: 14px; right: 14px; bottom: 12px; height: 10px; border-radius: 6px; background: repeating-linear-gradient(90deg, var(--line) 0 22px, transparent 22px 40px); }
+.bitem { position: absolute; left: 0; top: 10px; display: flex; flex-direction: column; align-items: center; touch-action: none; cursor: grab; user-select: none; -webkit-user-select: none; min-width: 130px; padding: 6px 12px 4px; background: var(--stage); color: #23302a; border-radius: 20px; box-shadow: 0 6px 0 rgba(0,0,0,.14); }
+.bitem svg { width: 104px; height: 104px; pointer-events: none; }
+.bitem span { font-size: 22px; white-space: nowrap; pointer-events: none; }
+.bitem.drag { z-index: 10; cursor: grabbing; box-shadow: 0 18px 26px rgba(0,0,0,.3); }
+.toast { min-height: 48px; text-align: center; font-size: clamp(22px, 3vw, 30px); }
+.toast.ok { color: var(--good); } .toast.no { color: var(--bad); }
+
+/* find the mistakes */
+.fgrid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+.fcol { background: var(--surface); border: 3px solid var(--line); border-radius: 22px; overflow: hidden; display: flex; flex-direction: column; }
+.fhead { color: #fff; display: flex; align-items: center; gap: 10px; justify-content: center; padding: 8px; font-size: clamp(22px, 3vw, 32px); }
+.fhead .ic { width: 44px; height: 44px; }
+.ftiles { display: grid; grid-template-columns: repeat(auto-fill, minmax(118px, 1fr)); gap: 10px; padding: 12px; }
+.ftile { background: var(--stage); color: #23302a; border: 4px solid transparent; border-radius: 18px; padding: 6px 4px; display: flex; flex-direction: column; align-items: center; font-size: 20px; min-height: 140px; line-height: 1.4; }
+.ftile svg { width: 84px; height: 84px; pointer-events: none; }
+.ftile.ok { border-color: var(--good); }
+.ftile .okb { color: #fff; background: var(--good); border-radius: 10px; padding: 0 10px; font-size: 16px; }
+.ftile.shake { animation: shake .4s; }
+@keyframes shake { 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
+.msg { min-height: 60px; text-align: center; font-size: clamp(20px, 2.6vw, 28px); }
+.msg.ok { color: var(--good); } .msg.no { color: var(--bad); }
+.lives { display: inline-flex; gap: 6px; vertical-align: middle; }
+.lives i { width: 18px; height: 18px; border-radius: 50%; background: var(--bad); display: inline-block; }
+.lives i.off { background: transparent; border: 3px solid var(--line); }
+
+/* true / false and 4R */
+.stmt { font-size: clamp(28px, 4.4vw, 48px); text-align: center; display: flex; gap: 12px; align-items: center; justify-content: center; flex-wrap: wrap; }
+.tfrow { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.tfbtn { border: none; border-radius: 26px; color: #fff; min-height: clamp(110px, 18vh, 160px); font-size: clamp(34px, 5vw, 54px); display: flex; align-items: center; justify-content: center; gap: 16px; }
+.tfbtn svg { width: 64px; height: 64px; }
+.tfbtn.yes { background: #2b7a38; } .tfbtn.no { background: #b3362a; }
+.opts4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+.rbtn { border: none; border-radius: 24px; color: #fff; min-height: clamp(120px, 20vh, 180px); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; font-size: clamp(26px, 3.6vw, 40px); padding: 8px; }
+.scen { background: var(--stage); color: #23302a; border-radius: 28px; padding: 26px 34px; font-size: clamp(30px, 4.6vw, 52px); line-height: 1.5; text-align: center; max-width: 900px; box-shadow: 0 10px 0 rgba(0,0,0,.12); }
+
+@media (max-width: 560px) {
+  .bins { grid-template-columns: 1fr; }
+  .bin { flex-direction: row; min-height: 84px; justify-content: flex-start; padding-left: 20px; gap: 16px; }
+  .groups { grid-template-columns: repeat(2, 1fr); }
+  .fgrid { grid-template-columns: 1fr; }
+  .opts4 { grid-template-columns: repeat(2, 1fr); }
+  .beltmode .bins { grid-template-columns: repeat(3, 1fr); }
+  .beltmode .bin { flex-direction: column; justify-content: center; padding: 8px 2px; font-size: 20px; min-height: 100px; gap: 4px; }
+  .beltmode .bitem svg { width: 80px; height: 80px; }
+}
+
+/* feedback + summary */
+.result { background: var(--surface); border: 4px solid var(--line); border-radius: 32px; padding: 22px 30px; display: flex; flex-direction: column; align-items: center; gap: 12px; text-align: center; max-width: 860px; width: 100%; }
+.result.ok { border-color: var(--good); } .result.no { border-color: var(--bad); }
+.result .head { display: flex; align-items: center; gap: 16px; font-size: clamp(34px, 6vw, 60px); line-height: 1.3; }
+.result.ok .head { color: var(--good); } .result.no .head { color: var(--bad); }
+.result .head svg { width: 68px; height: 68px; flex: none; }
+.result .what { display: flex; align-items: center; gap: 16px; font-size: clamp(24px, 3.4vw, 34px); flex-wrap: wrap; justify-content: center; }
+.mini { width: 92px; height: 92px; background: var(--stage); border-radius: 20px; padding: 6px; flex: none; display: grid; place-items: center; }
+.mini svg { width: 100%; height: 100%; }
+.result .why { font-size: clamp(22px, 3vw, 30px); max-width: 30em; }
+.result .q { font-size: 24px; color: var(--ink2); }
+.sumlist { display: flex; flex-direction: column; gap: 8px; width: 100%; text-align: left; }
+.sumrow { display: grid; grid-template-columns: 70px 1fr; gap: 14px; align-items: center; font-size: 24px; line-height: 1.4; }
+.sumrow .mini { width: 70px; height: 70px; border-radius: 16px; padding: 4px; }
+.confetti { position: fixed; inset: 0; pointer-events: none; overflow: hidden; z-index: 30; }
+.confetti i { position: absolute; top: -24px; width: 14px; height: 20px; border-radius: 3px; animation: fall 1.7s ease-in forwards; }
+@keyframes fall { to { transform: translate(var(--dx), 110vh) rotate(var(--r)); } }
+@media (prefers-reduced-motion: reduce) { .confetti { display: none; } .itemcard { transition: none; } .ftile.shake { animation: none; } .track i { transition: none; } }
+
+/* round summary */
+.plist { display: flex; flex-direction: column; gap: 10px; width: 100%; max-width: 760px; }
+.prow { display: grid; grid-template-columns: minmax(120px, 220px) 1fr 70px; gap: 14px; align-items: center; font-size: 26px; text-align: left; }
+.prow .bar { background: var(--line); border-radius: 999px; height: 26px; overflow: hidden; }
+.prow .bar i { display: block; height: 100%; background: var(--accent); border-radius: 999px; }
+.prow .pt { text-align: right; font-size: 30px; }
+
+/* board */
+.board-head { display: flex; flex-wrap: wrap; gap: 16px; align-items: end; justify-content: space-between; }
+.board-head h1 { font-size: clamp(34px, 5vw, 54px); font-weight: 400; line-height: 1.3; }
+.total { background: var(--surface); border: 3px solid var(--line); border-radius: 26px; padding: 8px 30px; text-align: center; }
+.total span { display: block; font-size: 22px; color: var(--ink2); }
+.total b { font-size: clamp(52px, 8vw, 88px); font-weight: 400; color: var(--accent); line-height: 1.1; font-variant-numeric: tabular-nums; }
+.grid2 { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); gap: 24px; align-items: start; }
+@media (max-width: 900px) { .grid2 { grid-template-columns: 1fr; } }
+.card { background: var(--surface); border: 2px solid var(--line); border-radius: 26px; padding: 22px 26px; display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+.card h2 { font-size: 30px; font-weight: 400; }
+.ctl { display: flex; flex-wrap: wrap; gap: 10px 14px; align-items: center; }
+.ctl > span.lab { font-size: 22px; color: var(--ink2); }
+.ctl .goal { display: inline-flex; align-items: center; gap: 8px; font-size: 26px; }
+.energy .track { height: 44px; }
+.energy .big { font-size: clamp(30px, 5vw, 52px); line-height: 1.3; }
+.energy .win { color: var(--good); font-size: 30px; }
+.grow-row { display: grid; grid-template-columns: 150px minmax(0, 1fr) auto; gap: 6px 16px; align-items: center; }
+.grow-row .pts { min-width: 70px; }
+.adjcell { display: flex; align-items: center; gap: 10px; justify-content: flex-end; }
+.adjcell .btn-sm { min-width: 52px; font-size: 26px; padding: 2px 12px; }
+@media (max-width: 560px) { .grow-row { grid-template-columns: 110px minmax(0, 1fr) auto; gap: 6px 10px; } }
+.grow-row .chip { font-size: 24px; text-align: center; padding: 4px 10px; }
+.grow-row .bar { background: var(--line); border-radius: 14px; height: 44px; overflow: hidden; }
+.grow-row .bar i { display: block; height: 100%; border-radius: 14px; transition: width .5s ease; min-width: 10px; }
+.grow-row .pts { text-align: right; font-size: 40px; font-variant-numeric: tabular-nums; line-height: 1.1; }
+.grow-row .meta { grid-column: 2 / 4; font-size: 17px; color: var(--ink2); margin-top: -2px; }
+.miss { display: grid; grid-template-columns: 76px 1fr; gap: 14px; align-items: center; }
+.miss .mini { width: 76px; height: 76px; border-radius: 16px; padding: 5px; }
+.miss p { font-size: 22px; line-height: 1.4; }
+.miss small { color: var(--ink2); font-size: 17px; }
+.empty { color: var(--ink2); font-size: 22px; padding: 10px 0; }
+.confirm { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+</style>
+
+<div class="app" id="app"></div>
+
+<script>
+(function () {
+  'use strict';
+  var K = '#1b1b1b';
+  var SW = 'stroke="' + K + '" stroke-width="5" stroke-linejoin="round" stroke-linecap="round"';
+  function arrows(col, w) {
+    return [0, 120, 240].map(function (r) {
+      return '<g transform="rotate(' + r + ')"><path d="M0 -34A34 34 0 0 1 33.5 5.9" fill="none" stroke="' + col + '" stroke-width="' + w + '" stroke-linecap="round"/><polygon points="44.3,7.8 22.7,4 31.1,19.6" fill="' + col + '"/></g>';
+    }).join('');
+  }
+
+  /* ---------- bins ---------- */
+  var BINS = {
+    recycle: { name: '資源回收', cls: 'b-recycle', color: '#2b6fc4',
+      icon: '<svg viewBox="-50 -50 100 100" aria-hidden="true"><g transform="scale(1.1)">' + arrows('#2b6fc4', 10) + '</g></svg>' },
+    food: { name: '廚餘', cls: 'b-food', color: '#b45f06',
+      icon: '<svg viewBox="0 0 100 100" aria-hidden="true"><path d="M50 32C40 22 16 26 18 54C20 74 38 90 50 84C62 90 80 74 82 54C84 26 60 22 50 32Z" fill="#b45f06"/><path d="M50 32C50 22 56 15 66 12" stroke="#2b7a38" stroke-width="7" fill="none" stroke-linecap="round"/></svg>' },
+    trash: { name: '一般垃圾', cls: 'b-trash', color: '#5b6470',
+      icon: '<svg viewBox="0 0 100 100" aria-hidden="true"><rect x="28" y="38" width="44" height="48" rx="7" fill="#5b6470"/><rect x="22" y="27" width="56" height="11" rx="5" fill="#5b6470"/><rect x="41" y="18" width="18" height="9" rx="4" fill="#5b6470"/><path d="M41 48v30M50 48v30M59 48v30" stroke="#fff" stroke-width="4.5" stroke-linecap="round"/></svg>' }
+  };
+  var BIN_ORDER = ['recycle', 'food', 'trash'];
+
+  /* ---------- items (drawn on a 200x200 canvas) ---------- */
+  var ITEMS = [
+    { id: 'pet', name: '寶特瓶', bin: 'recycle', why: '乾淨的寶特瓶可以回收，倒乾淨、壓扁再丟。',
+      svg: '<rect x="80" y="12" width="40" height="24" rx="6" fill="#6b7280" ' + SW + '/><path d="M86 36h28v20c0 10 28 16 28 40v72q0 14-14 14H72q-14 0-14-14V96c0-24 28-30 28-40z" fill="#d6ecff" ' + SW + '/><rect x="58" y="104" width="84" height="46" fill="#2b6fc4" ' + SW + '/><path d="M72 127h56" stroke="#fff" stroke-width="6" stroke-linecap="round"/>' },
+    { id: 'can', name: '鋁罐', bin: 'recycle', why: '鐵鋁罐可以回收，喝完洗一洗、壓扁。',
+      svg: '<path d="M56 44h88l6 10v104l-6 10H56l-6-10V54z" fill="#cfd4dc" ' + SW + '/><rect x="50" y="76" width="100" height="64" fill="#e0523f" ' + SW + '/><ellipse cx="100" cy="44" rx="44" ry="9" fill="#e8ebf0" ' + SW + '/><path d="M86 108h28M100 94v28" stroke="#fff" stroke-width="6" stroke-linecap="round"/>' },
+    { id: 'news', name: '報紙', bin: 'recycle', why: '乾淨的紙類可以回收，要保持乾燥。',
+      svg: '<rect x="34" y="40" width="132" height="120" rx="6" fill="#f2efe4" ' + SW + '/><rect x="48" y="54" width="104" height="26" fill="#23302a"/><path d="M48 98h46M48 112h46M48 126h46M48 140h46M108 98h44M108 112h44M108 126h44M108 140h44" stroke="#8a8f94" stroke-width="5" stroke-linecap="round"/>' },
+    { id: 'box', name: '紙箱', bin: 'recycle', why: '紙箱壓扁就能回收，膠帶撕掉更好。',
+      svg: '<path d="M30 62L100 36L170 62V140L100 168L30 140Z" fill="#c8924f" ' + SW + '/><path d="M30 62L100 88L170 62M100 88V168" fill="none" ' + SW + '/><path d="M72 49L142 75V96L72 70Z" fill="#e8c88a" ' + SW + '/>' },
+    { id: 'milk', name: '牛奶盒', bin: 'recycle', why: '洗乾淨、壓扁的鋁箔包可以回收。',
+      svg: '<path d="M58 70h84v100H58z" fill="#fff" ' + SW + '/><path d="M58 70L100 30l42 40z" fill="#2b6fc4" ' + SW + '/><rect x="58" y="104" width="84" height="34" fill="#2b6fc4"/><path d="M58 70h84v100H58z" fill="none" ' + SW + '/>' },
+    { id: 'shampoo', name: '洗髮精瓶', bin: 'recycle', why: '塑膠瓶罐洗乾淨可以回收。',
+      svg: '<path d="M92 32V18h34" fill="none" ' + SW + ' stroke-width="9"/><rect x="86" y="30" width="28" height="18" fill="#9aa1ab" ' + SW + '/><rect x="56" y="48" width="88" height="128" rx="22" fill="#58b368" ' + SW + '/><rect x="70" y="86" width="60" height="50" rx="8" fill="#fff" ' + SW + '/>' },
+    { id: 'core', name: '蘋果核', bin: 'food', why: '水果的核和皮是廚餘。',
+      svg: '<path d="M100 54V30" ' + SW + '/><path d="M44 78C40 52 66 44 84 54C92 58 108 58 116 54C134 44 160 52 156 78C154 90 148 96 142 98H58C52 96 46 90 44 78Z" fill="#e0523f" ' + SW + '/><path d="M80 98H120L112 124H88Z" fill="#f3e3b3" ' + SW + '/><ellipse cx="94" cy="111" rx="3" ry="5" fill="#6b4a1f"/><ellipse cx="106" cy="111" rx="3" ry="5" fill="#6b4a1f"/><path d="M58 124H142C148 126 154 134 156 146C160 172 134 182 116 172C108 168 92 168 84 172C66 182 40 172 44 146C46 134 52 126 58 124Z" fill="#e0523f" ' + SW + '/>' },
+    { id: 'rice', name: '剩飯', bin: 'food', why: '吃剩的飯菜是廚餘。',
+      svg: '<path d="M30 100h140c0 44-28 70-70 70s-70-26-70-70z" fill="#5b8bd9" ' + SW + '/><path d="M42 100C42 62 70 44 100 44s58 18 58 56z" fill="#fff" ' + SW + '/><path d="M76 78l8 4M104 66l8 4M124 86l8 4M92 90l8 4M64 94l8 4" stroke="#b9bec4" stroke-width="5" stroke-linecap="round"/>' },
+    { id: 'leaf', name: '菜葉', bin: 'food', why: '蔬菜葉是廚餘。',
+      svg: '<path d="M40 150C30 70 90 24 164 34C174 108 126 168 40 150Z" fill="#6bb04a" ' + SW + '/><path d="M40 150C80 110 112 80 150 48M84 112l-6-26M104 94l-2-30M118 80l22 2M96 108l30 4" fill="none" stroke="#2f6a2a" stroke-width="5" stroke-linecap="round"/>' },
+    { id: 'bread', name: '吃剩的麵包', bin: 'food', why: '吃剩的麵包是廚餘。',
+      svg: '<path d="M30 110C20 70 50 44 100 44s80 26 70 66v40q0 14-14 14H44q-14 0-14-14z" fill="#d9a05b" ' + SW + '/><path d="M62 70l16 22M96 62l16 22M130 70l16 22" stroke="#f3d29c" stroke-width="7" stroke-linecap="round"/>' },
+    { id: 'banana', name: '香蕉皮', bin: 'food', why: '香蕉皮是廚餘。',
+      svg: '<rect x="92" y="44" width="16" height="80" rx="8" fill="#f3e3b3" ' + SW + '/><path d="M100 124C70 92 38 96 22 118C40 124 70 130 100 124Z" fill="#f5d33b" ' + SW + '/><path d="M100 124C130 92 162 96 178 118C160 124 130 130 100 124Z" fill="#f5d33b" ' + SW + '/><path d="M100 124C84 144 86 172 100 188C114 172 116 144 100 124Z" fill="#f5d33b" ' + SW + '/>' },
+    { id: 'tissue', name: '用過的衛生紙', bin: 'trash', why: '用過的衛生紙髒了，不能回收，丟一般垃圾。',
+      svg: '<path d="M44 110C30 80 56 48 88 56C100 30 142 36 148 66C176 70 180 112 156 128C160 156 126 172 104 160C80 176 46 158 52 132C40 128 40 116 44 110Z" fill="#ffffff" ' + SW + '/><path d="M66 100C80 92 90 98 98 92M110 76C112 92 124 98 138 94M80 130C96 124 108 134 122 128M130 112C134 124 140 132 150 134" fill="none" stroke="#b8bcc2" stroke-width="5" stroke-linecap="round"/>' },
+    { id: 'pizza', name: '油膩的披薩盒', bin: 'trash', why: '沾到油的紙盒不能回收，丟一般垃圾。',
+      svg: '<rect x="28" y="28" width="144" height="144" rx="8" fill="#d9a85c" ' + SW + '/><ellipse cx="62" cy="150" rx="22" ry="14" fill="#a0652a" opacity="0.55"/><ellipse cx="148" cy="52" rx="18" ry="12" fill="#a0652a" opacity="0.55"/><path d="M100 150L56 62Q100 40 144 62Z" fill="#ffd24d" ' + SW + '/><circle cx="86" cy="82" r="9" fill="#e0523f"/><circle cx="114" cy="86" r="9" fill="#e0523f"/><circle cx="100" cy="112" r="9" fill="#e0523f"/>' },
+    { id: 'straw', name: '吸管', bin: 'trash', why: '吸管又小又常沾到飲料，丟一般垃圾。',
+      svg: '<path d="M62 172L112 78Q124 54 156 62" fill="none" stroke="' + K + '" stroke-width="30" stroke-linecap="round" stroke-linejoin="round"/><path d="M62 172L112 78Q124 54 156 62" fill="none" stroke="#ee7a66" stroke-width="18" stroke-linecap="round" stroke-linejoin="round"/><path d="M62 172L112 78Q124 54 156 62" fill="none" stroke="#fff" stroke-width="18" stroke-dasharray="14 26" stroke-linejoin="round"/>' },
+    { id: 'snack', name: '餅乾包裝袋', bin: 'trash', why: '零食包裝袋是好幾層材料做的，丟一般垃圾。',
+      svg: '<path d="M44 40h112l-6 10v100l6 10H44l6-10V50z" fill="#e0523f" ' + SW + '/><path d="M50 52h100M50 158h100" stroke="#fff" stroke-width="5" stroke-dasharray="5 6"/><ellipse cx="100" cy="104" rx="34" ry="26" fill="#ffd24d" ' + SW + '/>' },
+    { id: 'chop', name: '用過的免洗筷', bin: 'trash', why: '用過的免洗筷丟一般垃圾。',
+      svg: '<g transform="rotate(-18 100 100)"><rect x="82" y="18" width="12" height="164" rx="5" fill="#e3b778" ' + SW + '/><rect x="106" y="18" width="12" height="164" rx="5" fill="#e3b778" ' + SW + '/><rect x="74" y="100" width="52" height="58" fill="#f2efe4" ' + SW + '/><path d="M86 118h28M86 134h28" stroke="#e0523f" stroke-width="5" stroke-linecap="round"/></g>' },
+    { id: 'mask', name: '用過的口罩', bin: 'trash', why: '用過的口罩丟一般垃圾。',
+      svg: '<rect x="48" y="62" width="104" height="76" rx="18" fill="#cfe9ff" ' + SW + '/><path d="M48 84h104M48 100h104M48 116h104" stroke="#8fb6d9" stroke-width="5"/><path d="M48 76C26 76 22 100 30 118C34 126 44 128 48 124M152 76C174 76 178 100 170 118C166 126 156 128 152 124" fill="none" ' + SW + '/>' }
+  ];
+  var BY_ID = {};
+  ITEMS.forEach(function (it) { BY_ID[it.id] = it; });
+  function itemSvg(it) { return '<svg viewBox="0 0 200 200" role="img" aria-label="' + it.name + '">' + it.svg + '</svg>'; }
+
+  /* ---------- 4R ---------- */
+  var RS = {
+    refuse: { name: '拒絕', en: 'Refuse', color: '#b3362a',
+      icon: '<svg viewBox="0 0 200 200" aria-hidden="true"><circle cx="100" cy="100" r="78" fill="#fbfbf8" stroke="#d64545" stroke-width="14"/><g transform="translate(26 22) scale(.74)"><path d="M62 172L112 78Q124 54 156 62" fill="none" stroke="#1b1b1b" stroke-width="30" stroke-linecap="round" stroke-linejoin="round"/><path d="M62 172L112 78Q124 54 156 62" fill="none" stroke="#ee7a66" stroke-width="18" stroke-linecap="round" stroke-linejoin="round"/></g><path d="M45 155L155 45" stroke="#d64545" stroke-width="14" stroke-linecap="round"/></svg>' },
+    reduce: { name: '減量', en: 'Reduce', color: '#9a5a00',
+      icon: '<svg viewBox="0 0 200 200" aria-hidden="true"><path d="M58 70H142L152 176H48Z" fill="#a8c85a" ' + SW + '/><path d="M78 70C78 30 122 30 122 70" fill="none" stroke="#1b1b1b" stroke-width="7" stroke-linecap="round"/><path d="M100 150C70 130 76 108 90 108C96 108 100 114 100 114C100 114 104 108 110 108C124 108 130 130 100 150Z" fill="#fff" stroke="#1b1b1b" stroke-width="4"/></svg>' },
+    reuse: { name: '重複用', en: 'Reuse', color: '#2b6fc4',
+      icon: '<svg viewBox="0 0 200 200" aria-hidden="true"><rect x="82" y="16" width="36" height="26" rx="6" fill="#6b7280" ' + SW + '/><path d="M70 42H130V176Q130 186 120 186H80Q70 186 70 176Z" fill="#5b8bd9" ' + SW + '/><rect x="70" y="86" width="60" height="44" fill="#fff" stroke="#1b1b1b" stroke-width="4"/><g transform="translate(100 108) scale(.34)">' + arrows('#2f9e5b', 14) + '</g></svg>' },
+    recycle: { name: '回收', en: 'Recycle', color: '#2b7a38',
+      icon: '<svg viewBox="0 0 200 200" aria-hidden="true"><circle cx="100" cy="100" r="80" fill="#fff" stroke="#1b1b1b" stroke-width="5"/><g transform="translate(100 100) scale(1.5)">' + arrows('#2f9e5b', 9) + '</g></svg>' }
+  };
+  var R_ORDER = ['refuse', 'reduce', 'reuse', 'recycle'];
+  var SCEN = [
+    { id: 's1', q: '店員要給你塑膠袋，你說：「不用了，謝謝！」', r: 'refuse', why: '一開始就不要拿用不到的東西，就是拒絕。' },
+    { id: 's2', q: '點外送的時候，跟店家說：「不用餐具」', r: 'refuse', why: '不拿用不到的餐具，垃圾就不會出現，這是拒絕。' },
+    { id: 's3', q: '喝飲料不用吸管，直接喝', r: 'refuse', why: '不使用一次就丟的東西，是拒絕。' },
+    { id: 's4', q: '只盛自己吃得完的飯菜', r: 'reduce', why: '少拿一點，垃圾就變少，這是減量。' },
+    { id: 's5', q: '影印的時候用雙面，少用一張紙', r: 'reduce', why: '用得比較少，這是減量。' },
+    { id: 's6', q: '買東西時，選包裝比較少的', r: 'reduce', why: '包裝少，丟掉的垃圾就少，這是減量。' },
+    { id: 's7', q: '每天帶自己的水壺去學校', r: 'reuse', why: '同一個水壺用很多次，就是重複使用。' },
+    { id: 's8', q: '穿不下的衣服，送給弟弟妹妹穿', r: 'reuse', why: '東西換人繼續用，是重複使用。' },
+    { id: 's9', q: '用過的紙，背面拿來當計算紙', r: 'reuse', why: '一張紙用兩次，是重複使用。' },
+    { id: 's10', q: '把洗乾淨的寶特瓶丟進資源回收桶', r: 'recycle', why: '瓶子會變成新的東西再使用，這是回收。' },
+    { id: 's11', q: '把看完的舊報紙綁好，拿去回收', r: 'recycle', why: '紙可以做成再生紙，這是回收。' },
+    { id: 's12', q: '把喝完的鋁罐壓扁，再拿去回收', r: 'recycle', why: '鋁罐可以熔化再做成新的罐子，這是回收。' }
+  ];
+  var SC_BY = {};
+  SCEN.forEach(function (s) { SC_BY['r4_' + s.id] = s; });
+
+  /* ---------- games ---------- */
+  var GAMES = [
+    { id: 'mix', name: '綜合', how: '每人 6 題，分類、對或錯、4R 情境混在一起，要看清楚題目喔！' },
+  { id: 'sort', name: '分類', how: '每人 3 題。把物品拖進正確的桶子。' },
+    { id: 'belt', name: '輸送帶', how: '30 秒內，把輸送帶上的垃圾拖進正確的桶子，別讓它掉下去！' },
+    { id: 'find', name: '找出放錯的', how: '桶子裡有幾件放錯了，點出來幫它搬家。猜錯 3 次就結束。' },
+    { id: 'tf', name: '對或錯', how: '每人 5 題。看看這句話說得對不對。' },
+    { id: 'r4', name: '4R 情境', how: '每人 3 題。選出這是哪一種 R。' }
+  ];
+  function gameOf(id) { for (var i = 0; i < GAMES.length; i++) if (GAMES[i].id === id) return GAMES[i]; return GAMES[0]; }
+
+  /* ---------- groups ---------- */
+  var GROUPS = ['#c93c30', '#b86a00', '#2f7d3b', '#1f7f86', '#2b6fc4', '#7d4fb8', '#b83a83', '#7a5238'];
+  var COLOR_NAME = ['紅', '橘', '綠', '青', '藍', '紫', '粉', '咖啡'];
+  function gcolor(n) { return GROUPS[(n - 1) % GROUPS.length]; }
+
+  /* ---------- helpers ---------- */
+  function h(tag, props) {
+    var e = document.createElement(tag);
+    props = props || {};
+    for (var k in props) {
+      var v = props[k];
+      if (v === false || v == null) continue;
+      if (k === 'class') e.className = v;
+      else if (k === 'html') e.innerHTML = v;
+      else if (k.slice(0, 2) === 'on') e.addEventListener(k.slice(2), v);
+      else e.setAttribute(k, v === true ? '' : v);
+    }
+    for (var i = 2; i < arguments.length; i++) {
+      var c = arguments[i];
+      (Array.isArray(c) ? c : [c]).forEach(function (x) {
+        if (x == null || x === false) return;
+        e.append(x.nodeType ? x : document.createTextNode(String(x)));
+      });
+    }
+    return e;
+  }
+  function shuffle(a) { a = a.slice(); for (var i = a.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)); var t = a[i]; a[i] = a[j]; a[j] = t; } return a; }
+  function pick(a) { return a[Math.floor(Math.random() * a.length)]; }
+  function lsGet(k) { try { return JSON.parse(localStorage.getItem(k)); } catch (e) { return null; } }
+  function lsSet(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) { /* storage may be blocked */ } }
+  function tag(bin) { var d = BINS[bin]; return h('span', { class: 'tag ' + d.cls }, d.name); }
+  function binAt(e) {
+    var els = document.elementsFromPoint(e.clientX, e.clientY);
+    for (var i = 0; i < els.length; i++) { var b = els[i].closest && els[i].closest('.bin'); if (b) return b; }
+    return null;
+  }
+
+  /* ---------- sound + confetti ---------- */
+  var ac = null;
+  function tone(seq) {
+    if (!st.sound) return;
+    try {
+      ac = ac || new (window.AudioContext || window.webkitAudioContext)();
+      var t = ac.currentTime;
+      seq.forEach(function (n, i) {
+        var o = ac.createOscillator(), g = ac.createGain();
+        o.type = 'triangle'; o.frequency.value = n[0];
+        g.gain.setValueAtTime(0.0001, t + i * 0.14);
+        g.gain.exponentialRampToValueAtTime(0.25, t + i * 0.14 + 0.02);
+        g.gain.exponentialRampToValueAtTime(0.0001, t + i * 0.14 + n[1]);
+        o.connect(g); g.connect(ac.destination);
+        o.start(t + i * 0.14); o.stop(t + i * 0.14 + n[1] + 0.05);
+      });
+    } catch (e) { /* audio is optional */ }
+  }
+  function good() { tone([[660, .16], [880, .26]]); }
+  function bad() { tone([[240, .32]]); }
+  function confetti() {
+    if (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    var box = h('div', { class: 'confetti', 'aria-hidden': 'true' });
+    var cols = ['#c93c30', '#e0a020', '#2f9e44', '#2b6fc4', '#7d4fb8', '#b83a83'];
+    for (var i = 0; i < 34; i++) {
+      var p = h('i');
+      p.style.left = Math.random() * 100 + '%';
+      p.style.background = cols[i % cols.length];
+      p.style.setProperty('--dx', (Math.random() * 200 - 100) + 'px');
+      p.style.setProperty('--r', (Math.random() * 720 - 360) + 'deg');
+      p.style.animationDelay = Math.random() * 0.25 + 's';
+      box.append(p);
+    }
+    document.body.append(box);
+    setTimeout(function () { box.remove(); }, 2300);
+  }
+
+  /* ---------- state ---------- */
+  var LS = 'garbage-game-v2', LSC = 'garbage-cfg-v1';
+  var st = Object.assign({ screen: 'setup', group: null, players: [], turn: 0, round: 1, points: 0, played: 0, correct: 0, misses: {}, queue: [], cur: null, last: null, game: 'sort', turnPts: 0, turnLog: [], turnSkipped: 0, sound: true, setupCount: 4, setupNames: [] }, lsGet(LS) || {});
+  // a belt round cannot resume mid-run; anything half-finished from an old session restarts at "ready"
+  if (st.screen === 'play' && st.cur && st.cur.kind === 'belt') st.screen = 'ready';
+  if ((st.screen === 'play' || st.screen === 'feedback') && !(st.cur && st.cur.kind)) st.screen = st.players.length ? 'ready' : 'setup';
+  var cfg = Object.assign({ game: 'sort', coop: false, goal: 40 }, lsGet(LSC) || {});
+  function save() { lsSet(LS, st); }
+  var db = null, dbState = 'pending', net = 'solo', wroteOk = false;
+  var unsubOwn = null, unsubCfg = null, unsubTotals = null, classTotal = 0;
+
+  function nextItem() {
+    if (!st.queue.length) st.queue = shuffle(ITEMS.map(function (i) { return i.id; }));
+    return st.queue.shift();
+  }
+
+  /* ---------- sync + class settings ---------- */
+  function sync() {
+    if (!db || st.group == null) return Promise.resolve();
+    return db.doc('scores/g' + st.group).set({ group: st.group, points: st.points, played: st.played, correct: st.correct, misses: st.misses, at: Date.now() })
+      .then(function () { net = 'ok'; wroteOk = true; paintTop(); })
+      .catch(function () { net = 'err'; paintTop(); });
+  }
+  function watchOwn() {
+    if (unsubOwn) { unsubOwn(); unsubOwn = null; }
+    if (!db || st.group == null) return;
+    unsubOwn = db.doc('scores/g' + st.group).onSnapshot(function (s) {
+      // the teacher reset the board: start this tablet's score again from zero
+      if (!s.exists && wroteOk && !s.metadata.hasPendingWrites && !s.metadata.fromCache && st.played > 0) {
+        st.points = 0; st.played = 0; st.correct = 0; st.misses = {}; st.round = 1; st.turn = 0;
+        st.players.forEach(function (p) { p.points = 0; });
+        st.screen = 'ready'; save(); render();
+      }
+    }, function () { });
+  }
+  function watchCfg() {
+    if (!db || unsubCfg) return;
+    unsubCfg = db.doc('config/class').onSnapshot(function (s) {
+      if (s.exists) {
+        var d = s.data() || {};
+        if (typeof d.game === 'string') cfg.game = d.game;
+        cfg.coop = !!d.coop;
+        if (typeof d.goal === 'number') cfg.goal = d.goal;
+      }
+      repaintCfg();
+    }, function () { });
+  }
+  function watchTotals() {
+    if (!db || unsubTotals) return;
+    unsubTotals = db.collection('scores').onSnapshot(function (s) {
+      classTotal = s.docs.reduce(function (n, d) { return n + ((d.data() || {}).points || 0); }, 0);
+      paintCoop();
+    }, function () { });
+  }
+  function setCfg(p) {
+    Object.assign(cfg, p);
+    if (db) db.doc('config/class').set({ game: cfg.game, coop: !!cfg.coop, goal: cfg.goal }).catch(function () { });
+    else lsSet(LSC, cfg);
+    repaintCfg();
+  }
+  function repaintCfg() {
+    if (isBoard()) paintBoard();
+    else {
+      paintTop(); paintCoop();
+      if (st.screen === 'ready') render();
+      var gn = document.getElementById('gamenote');
+      if (gn) gn.textContent = '玩法由老師在計分板選擇，現在是「' + gameOf(cfg.game).name + '」。';
+    }
+  }
+
+  /* ---------- turn engine ---------- */
+  function record(kind, id, ok, extra) {
+    st.played++;
+    if (ok) { st.points++; st.correct++; st.turnPts++; st.players[st.turn].points++; }
+    else st.misses[id] = (st.misses[id] || 0) + 1;
+    st.turnLog.push(Object.assign({ kind: kind, id: id, ok: ok }, extra || {}));
+  }
+  function makeScene() {
+    var used = {}, cols = { recycle: [], food: [], trash: [] }, wrong = [];
+    BIN_ORDER.forEach(function (b) {
+      shuffle(ITEMS.filter(function (i) { return i.bin === b; })).slice(0, 2).forEach(function (i) { cols[b].push(i.id); used[i.id] = 1; });
+    });
+    shuffle(ITEMS.filter(function (i) { return !used[i.id]; })).slice(0, 3).forEach(function (i) {
+      var where = pick(BIN_ORDER.filter(function (b) { return b !== i.bin; }));
+      cols[where].push(i.id); wrong.push(i.id);
+    });
+    BIN_ORDER.forEach(function (b) { cols[b] = shuffle(cols[b]); });
+    return { kind: 'find', cols: cols, wrong: wrong, found: [], strikes: 0, msg: null, over: false };
+  }
+  function startTurn() {
+    var g = cfg.game;
+    st.game = g; st.turnPts = 0; st.turnLog = []; st.turnSkipped = 0; st.last = null;
+    if (g === 'sort') {
+      var ids = [];
+      while (ids.length < 3) { var n = nextItem(); if (ids.indexOf(n) < 0) ids.push(n); }
+      st.cur = { kind: 'sort', n: 3, q: 0, ids: ids };
+    } else if (g === 'tf') {
+      st.cur = { kind: 'tf', n: 5, q: 0, qs: shuffle(ITEMS).slice(0, 5).map(function (it) {
+        var truth = Math.random() < 0.5;
+        return { id: it.id, shown: truth ? it.bin : pick(BIN_ORDER.filter(function (b) { return b !== it.bin; })) };
+      }) };
+    } else if (g === 'r4') {
+      st.cur = { kind: 'r4', n: 3, q: 0, rids: shuffle(SCEN).slice(0, 3).map(function (s) { return s.id; }) };
+    } else if (g === 'mix') {
+      var N = 6, types = shuffle(['sort', 'sort', 'tf', 'tf', 'r4', 'r4']), its = shuffle(ITEMS), sc = shuffle(SCEN), ii = 0, ri = 0;
+      var c = { kind: types[0], n: N, q: 0, types: types, ids: [], qs: [], rids: [] };
+      types.forEach(function (t) {
+        if (t === 'r4') { c.rids.push(sc[ri++].id); c.ids.push(null); c.qs.push(null); }
+        else {
+          var it = its[ii++]; c.rids.push(null);
+          if (t === 'sort') { c.ids.push(it.id); c.qs.push(null); }
+          else { c.ids.push(null); c.qs.push({ id: it.id, shown: Math.random() < 0.5 ? it.bin : pick(BIN_ORDER.filter(function (b) { return b !== it.bin; })) }); }
+        }
+      });
+      st.cur = c;
+    } else if (g === 'find') {
+      st.cur = makeScene();
+    } else {
+      st.cur = { kind: 'belt' };
+    }
+    st.screen = 'play'; save(); render();
+  }
+  function afterAnswer(ok) {
+    st.last = { ok: ok };
+    st.screen = 'feedback'; save(); sync(); render();
+    if (ok) { good(); confetti(); } else bad();
+  }
+  function nextQuestion() {
+    st.cur.q++;
+    if (st.cur.q >= st.cur.n) finishTurn(); else { if (st.cur.types) st.cur.kind = st.cur.types[st.cur.q]; st.last = null; st.screen = 'play'; save(); render(); }
+  }
+  function finishTurn() {
+    stopBelt();
+    if (st.cur && st.cur.kind === 'find' && !st.cur.over) {
+      st.cur.wrong.forEach(function (id) {
+        if (st.cur.found.indexOf(id) < 0) { st.misses[id] = (st.misses[id] || 0) + 1; st.turnLog.push({ kind: 'item', id: id, ok: false, unfound: true }); }
+      });
+      st.cur.over = true;
+    }
+    st.screen = 'turnsum'; save(); sync(); render();
+    if (st.turnPts >= 3) { good(); confetti(); }
+  }
+
+  /* ---------- top bar ---------- */
+  var root = document.getElementById('app');
+  function statusText() {
+    if (dbState === 'pending') return '連線中…';
+    if (!db) return '單機模式：分數只存在這台平板';
+    return net === 'err' ? '連線不穩，分數先存在這台' : '分數會傳到老師的畫面';
+  }
+  function topBar() {
+    var g = st.group;
+    return [
+      g != null && h('div', { class: 'chip', style: 'background:' + gcolor(g) }, '第 ' + g + ' 組'),
+      g != null && h('div', { class: 'score' }, '總分 ', h('b', {}, st.points)),
+      g != null && h('div', { class: 'gamepill' }, '玩法：' + gameOf(cfg.game).name),
+      h('div', { class: 'grow' }),
+      h('span', { class: 'status', role: 'status' }, statusText()),
+      h('button', { class: 'btn-sm', onclick: function () { st.sound = !st.sound; save(); paintTop(); }, 'aria-pressed': String(st.sound) }, st.sound ? '聲音：開' : '聲音：關'),
+      g != null && h('button', { class: 'btn-sm', onclick: function () { stopBelt(); st.screen = 'setup'; save(); render(); } }, '設定')
+    ];
+  }
+  function paintTop() {
+    var t = document.getElementById('top');
+    if (t) t.replaceChildren.apply(t, topBar().filter(Boolean));
+  }
+  function paintCoop() {
+    var c = document.getElementById('coop');
+    if (!c) return;
+    if (!cfg.coop || !db) { c.replaceChildren(); c.hidden = true; return; }
+    c.hidden = false;
+    var pct = Math.min(100, classTotal / Math.max(1, cfg.goal) * 100);
+    c.replaceChildren(h('span', {}, '全班一起闖關'), h('div', { class: 'track', role: 'img', 'aria-label': '全班 ' + classTotal + ' 分，目標 ' + cfg.goal + ' 分' }, h('i', { style: 'width:' + pct + '%' })), h('span', {}, classTotal + ' / ' + cfg.goal + (classTotal >= cfg.goal ? '・過關！' : '')));
+  }
+
+  /* ---------- setup ---------- */
+  function gameChooser(onPick) {
+    return h('div', { class: 'row', role: 'group', 'aria-label': '選擇玩法' }, GAMES.map(function (g) {
+      return h('button', { class: 'seg', 'aria-pressed': String(cfg.game === g.id), onclick: function () { onPick(g.id); } }, g.name);
+    }));
+  }
+  function setupView() {
+    var count = st.setupCount || 4;
+    var picked = st.group;
+    var names = st.setupNames.slice(0, count);
+    for (var i = names.length; i < count; i++) names.push('');
+    st.setupNames = names;
+    var gwrap = h('div', { class: 'groups', role: 'group', 'aria-label': '選擇組別' });
+    var nameWrap = h('div', { class: 'names' });
+    var cnt = h('output', {}, count);
+    var gameBox = h('div', {});
+    function paintGame() {
+      if (dbState === 'pending') { gameBox.replaceChildren(); return; }
+      if (db) gameBox.replaceChildren(h('p', { class: 'note', id: 'gamenote' }, '玩法由老師在計分板選擇，現在是「' + gameOf(cfg.game).name + '」。'));
+      else gameBox.replaceChildren(h('h2', {}, '玩法'), gameChooser(function (id) { setCfg({ game: id }); paintGame(); }));
+    }
+    function paintGroups() {
+      gwrap.replaceChildren.apply(gwrap, GROUPS.map(function (c, i) {
+        var n = i + 1;
+        return h('button', { class: 'gbtn', style: 'background:' + c, 'aria-pressed': String(picked === n), onclick: function () { picked = n; paintGroups(); startBtn.disabled = false; } }, '第 ' + n + ' 組・' + COLOR_NAME[i]);
+      }));
+    }
+    function paintNames() {
+      cnt.textContent = count;
+      nameWrap.replaceChildren.apply(nameWrap, names.slice(0, count).map(function (nm, i) {
+        return h('input', { type: 'text', id: 'nm' + i, maxlength: '8', placeholder: (i + 1) + ' 號', value: nm, 'aria-label': '第 ' + (i + 1) + ' 位小朋友的名字', oninput: function (e) { names[i] = e.target.value; st.setupNames = names; } });
+      }));
+    }
+    function step(d) { count = Math.max(2, Math.min(8, count + d)); st.setupCount = count; while (names.length < count) names.push(''); paintNames(); }
+    var startBtn = h('button', { class: 'btn-big', disabled: picked == null, onclick: function () {
+      st.group = picked;
+      st.players = names.slice(0, count).map(function (nm, i) { return { name: (nm || '').trim() || (i + 1) + ' 號', points: 0 }; });
+      st.turn = 0; st.round = 1; st.points = 0; st.played = 0; st.correct = 0; st.misses = {}; st.queue = []; st.cur = null; st.last = null;
+      st.screen = 'ready'; wroteOk = false; save(); watchOwn(); sync(); render();
+    } }, '開始遊戲');
+    paintGroups(); paintNames(); paintGame();
+    var resume = st.group != null && st.players.length ? h('button', { class: 'btn-ghost', onclick: function () {
+      st.screen = st.cur && st.cur.kind && st.cur.kind !== 'belt' && st.screen === 'setup' ? 'play' : 'ready';
+      if (st.cur && st.cur.kind === 'find' && st.cur.over) st.screen = 'turnsum';
+      save(); render();
+    } }, '回到遊戲（保留分數）') : null;
+    return h('main', {}, h('div', { class: 'setup' },
+      h('h1', {}, '垃圾分類大挑戰'),
+      h('h2', {}, '1. 選你們這一組'), gwrap,
+      h('h2', {}, '2. 這一組有幾位小朋友？'),
+      h('div', { class: 'stepper' }, h('button', { 'aria-label': '減少一位', onclick: function () { step(-1); } }, '−'), cnt, h('button', { 'aria-label': '增加一位', onclick: function () { step(1); } }, '+')),
+      h('h2', {}, '3. 寫上名字（不寫就用號碼）'), nameWrap,
+      gameBox,
+      h('div', { class: 'row' }, startBtn, resume),
+      h('p', { class: 'note' }, '按「開始遊戲」會把這一組的分數歸零。'),
+      h('a', { class: 'link', href: '#board' }, '老師計分板')
+    ));
+  }
+
+  function readyView() {
+    var p = st.players[st.turn], g = gameOf(cfg.game);
+    return h('main', {}, h('div', { class: 'center' },
+      h('span', { class: 'pill' }, '第 ' + st.round + ' 輪・第 ' + (st.turn + 1) + ' 位・' + g.name),
+      h('h1', {}, '輪到 ' + p.name + '！'),
+      h('p', { class: 'sub' }, g.how),
+      h('p', { class: 'sub' }, '把平板交給 ' + p.name + '，準備好了就按下面的按鈕。'),
+      h('button', { class: 'btn-big', onclick: startTurn }, '我準備好了')
+    ));
+  }
+
+  /* ---------- play: shared pieces ---------- */
+  function binsRow(disabled, rightBin) {
+    return h('div', { class: 'bins' }, BIN_ORDER.map(function (b) {
+      var d = BINS[b];
+      return h('button', { class: 'bin ' + d.cls + (rightBin === b ? ' right' : ''), 'data-bin': b, disabled: disabled, 'aria-label': d.name, onclick: function () { if (st.cur.kind === 'sort') answerSort(b); } },
+        h('span', { class: 'ic', html: d.icon }), d.name);
+    }));
+  }
+  function hint(title, sub) { return h('p', { class: 'hint' }, title, sub ? h('small', {}, sub) : null); }
+  function progress() { return '第 ' + (st.cur.q + 1) + ' / ' + st.cur.n + ' 題'; }
+
+  /* sort */
+  function sortView() {
+    var it = BY_ID[st.cur.ids[st.cur.q]], p = st.players[st.turn];
+    var card = h('div', { class: 'itemcard', role: 'img', 'aria-label': it.name }, h('div', { html: itemSvg(it) }), h('div', { class: 'nm' }, it.name));
+    enableDrag(card);
+    return h('main', {}, hint(p.name + '，這是什麼垃圾？', progress() + '・把它拖進桶子，或是直接點桶子'), h('div', { class: 'stage' }, card), binsRow(false));
+  }
+  function enableDrag(card) {
+    var sx = 0, sy = 0, on = false, hotBin = null;
+    function mark(b) { if (hotBin && hotBin !== b) hotBin.classList.remove('hot'); if (b) b.classList.add('hot'); hotBin = b; }
+    card.addEventListener('pointerdown', function (e) { on = true; sx = e.clientX; sy = e.clientY; card.setPointerCapture(e.pointerId); card.classList.add('drag'); });
+    card.addEventListener('pointermove', function (e) {
+      if (!on) return;
+      card.style.transform = 'translate(' + (e.clientX - sx) + 'px,' + (e.clientY - sy) + 'px) scale(.88)';
+      mark(binAt(e));
+    });
+    function end(e, cancel) {
+      if (!on) return; on = false;
+      var b = cancel ? null : binAt(e);
+      mark(null);
+      card.classList.remove('drag'); card.style.transform = '';
+      if (b) answerSort(b.getAttribute('data-bin'));
+    }
+    card.addEventListener('pointerup', function (e) { end(e, false); });
+    card.addEventListener('pointercancel', function (e) { end(e, true); });
+  }
+  function answerSort(bin) {
+    if (st.screen !== 'play' || st.cur.kind !== 'sort') return;
+    var it = BY_ID[st.cur.ids[st.cur.q]], ok = bin === it.bin;
+    record('item', it.id, ok);
+    afterAnswer(ok);
+  }
+
+  /* true / false */
+  var YES = '<svg viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="29" fill="#fff"/><path d="M18 33l10 10 19-21" fill="none" stroke="#2b7a38" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  var NO = '<svg viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="29" fill="#fff"/><path d="M21 21l22 22M43 21L21 43" fill="none" stroke="#b3362a" stroke-width="7" stroke-linecap="round"/></svg>';
+  function tfView() {
+    var q = st.cur.qs[st.cur.q], it = BY_ID[q.id], p = st.players[st.turn];
+    return h('main', {},
+      hint(p.name + '，這句話對嗎？', progress()),
+      h('div', { class: 'stage' }, h('div', { class: 'itemcard still' }, h('div', { html: itemSvg(it) }),
+        h('div', { class: 'stmt' }, '「' + it.name + '」要丟 ', tag(q.shown)))),
+      h('div', { class: 'tfrow' },
+        h('button', { class: 'tfbtn yes', onclick: function () { answerTF(true); } }, h('span', { html: YES }), '對'),
+        h('button', { class: 'tfbtn no', onclick: function () { answerTF(false); } }, h('span', { html: NO }), '錯'))
+    );
+  }
+  function answerTF(says) {
+    if (st.screen !== 'play' || st.cur.kind !== 'tf') return;
+    var q = st.cur.qs[st.cur.q], it = BY_ID[q.id];
+    var truth = q.shown === it.bin, ok = says === truth;
+    record('item', it.id, ok);
+    afterAnswer(ok);
+  }
+
+  /* 4R */
+  function r4View() {
+    var sc = SC_BY['r4_' + st.cur.rids[st.cur.q]], p = st.players[st.turn];
+    return h('main', {},
+      hint(p.name + '，這是哪一種 R？', progress()),
+      h('div', { class: 'stage' }, h('div', { class: 'scen' }, sc.q)),
+      h('div', { class: 'opts4' }, R_ORDER.map(function (r) {
+        var d = RS[r];
+        return h('button', { class: 'rbtn', style: 'background:' + d.color, onclick: function () { answerR4(r); } }, h('span', { class: 'ic', html: d.icon }), d.name);
+      }))
+    );
+  }
+  function answerR4(r) {
+    if (st.screen !== 'play' || st.cur.kind !== 'r4') return;
+    var sc = SC_BY['r4_' + st.cur.rids[st.cur.q]], ok = r === sc.r;
+    record('r4', 'r4_' + sc.id, ok);
+    afterAnswer(ok);
+  }
+
+  /* feedback card (sort / tf / 4R) */
+  var CHECK = '<svg viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="29" fill="currentColor"/><path d="M18 33l10 10 19-21" fill="none" stroke="#fff" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  var CROSS = '<svg viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="29" fill="currentColor"/><path d="M21 21l22 22M43 21L21 43" fill="none" stroke="#fff" stroke-width="7" stroke-linecap="round"/></svg>';
+  function feedbackView() {
+    var c = st.cur, ok = st.last.ok, what, why, extra = null, rightBin = null;
+    if (c.kind === 'r4') {
+      var sc = SC_BY['r4_' + c.rids[c.q]], r = RS[sc.r];
+      what = [h('div', { class: 'mini', html: r.icon }), h('span', {}, '這是「' + r.name + '」')]; why = sc.why;
+      extra = h('p', { class: 'q' }, sc.q);
+    } else {
+      var id = c.kind === 'tf' ? c.qs[c.q].id : c.ids[c.q], it = BY_ID[id];
+      what = [h('div', { class: 'mini', html: itemSvg(it) }), h('span', {}, it.name, ' 要丟 '), tag(it.bin)]; why = it.why;
+      if (c.kind === 'sort') rightBin = it.bin;
+    }
+    var last = c.q + 1 >= c.n;
+    return h('main', {},
+      h('div', { class: 'stage' },
+        h('div', { class: 'result ' + (ok ? 'ok' : 'no'), role: 'status' },
+          h('div', { class: 'head' }, h('span', { html: ok ? CHECK : CROSS }), ok ? '答對了！+1 分' : '再想一想！'),
+          extra, h('div', { class: 'what' }, what), h('p', { class: 'why' }, why),
+          h('button', { class: 'btn-big', onclick: nextQuestion }, last ? '看成績' : '下一題'))),
+      rightBin ? binsRow(true, rightBin) : null
+    );
+  }
+
+  /* ---------- belt ---------- */
+  var belt = null;
+  function stopBelt() { if (belt) { belt.over = true; cancelAnimationFrame(belt.raf); belt = null; } }
+  function beltView() {
+    var p = st.players[st.turn];
+    var lane = h('div', { class: 'lane', 'aria-label': '輸送帶' });
+    var bar = h('i');
+    var left = h('span', {}, '剩 30 秒');
+    var toast = h('p', { class: 'toast', role: 'status' }, '準備，開始！');
+    var m = h('main', { class: 'beltmode' }, hint(p.name + '，把垃圾拖進正確的桶子！'),
+      h('div', { class: 'row' }, left, h('div', { class: 'timebar grow', role: 'img', 'aria-label': '剩餘時間' }, bar)),
+      lane, toast, h('div', { class: 'grow' }), binsRow(true));
+    // bins must accept drops (they are buttons) but not clicks, so keep them enabled visually
+    m.querySelectorAll('.bin').forEach(function (b) { b.disabled = false; b.onclick = null; });
+    setTimeout(function () { startBelt(lane, bar, left, toast); }, 0);
+    return m;
+  }
+  function startBelt(lane, bar, left, toast) {
+    stopBelt();
+    var now = performance.now();
+    belt = { items: [], t0: now, last: now, lane: lane, over: false, raf: 0, shownSec: 30 };
+    function flash(ok, text) { toast.className = 'toast ' + (ok ? 'ok' : 'no'); toast.textContent = text; }
+    function spawn(W) {
+      var it = BY_ID[nextItem()];
+      var el = h('div', { class: 'bitem', role: 'img', 'aria-label': it.name }, h('div', { html: itemSvg(it) }), h('span', {}, it.name));
+      var o = { it: it, el: el, x: -150, y: 0, drag: null };
+      el.addEventListener('pointerdown', function (e) {
+        o.drag = { sx: e.clientX, sy: e.clientY, ox: o.x, oy: o.y, hot: null };
+        el.setPointerCapture(e.pointerId); el.classList.add('drag');
+      });
+      el.addEventListener('pointermove', function (e) {
+        if (!o.drag) return;
+        o.x = o.drag.ox + e.clientX - o.drag.sx; o.y = o.drag.oy + e.clientY - o.drag.sy;
+        var b = binAt(e);
+        if (o.drag.hot && o.drag.hot !== b) o.drag.hot.classList.remove('hot');
+        if (b) b.classList.add('hot');
+        o.drag.hot = b; place(o);
+      });
+      function drop(e, cancel) {
+        if (!o.drag) return;
+        var d = o.drag; o.drag = null; el.classList.remove('drag');
+        if (d.hot) d.hot.classList.remove('hot');
+        var b = cancel ? null : binAt(e);
+        if (!b) { o.y = 0; place(o); return; }
+        var bin = b.getAttribute('data-bin'), ok = bin === it.bin;
+        remove(o);
+        record('item', it.id, ok);
+        if (ok) { good(); flash(true, '答對了！' + it.name + ' +1'); }
+        else { bad(); flash(false, it.name + ' 要丟「' + BINS[it.bin].name + '」'); }
+        paintTop();
+      }
+      el.addEventListener('pointerup', function (e) { drop(e, false); });
+      el.addEventListener('pointercancel', function (e) { drop(e, true); });
+      lane.append(el); belt.items.push(o); place(o);
+    }
+    function place(o) { o.el.style.transform = 'translate(' + o.x + 'px,' + o.y + 'px)'; }
+    function remove(o) { o.el.remove(); var i = belt.items.indexOf(o); if (i >= 0) belt.items.splice(i, 1); }
+    function frame(t) {
+      if (!belt || belt.over) return;
+      var dt = Math.min(0.05, (t - belt.last) / 1000); belt.last = t;
+      var el = (t - belt.t0) / 1000, remain = Math.max(0, 30 - el), W = lane.clientWidth;
+      var v = 95 + 4 * el;
+      if (belt.items.length < 6 && belt.items.every(function (o) { return o.drag || o.x > 235; })) spawn(W);
+      belt.items.slice().forEach(function (o) {
+        if (o.drag) return;
+        o.x += v * dt; place(o);
+        if (o.x > W + 20) {
+          remove(o); st.turnSkipped++; st.turnLog.push({ kind: 'item', id: o.it.id, ok: false, skipped: true });
+          flash(false, o.it.name + ' 掉下去了');
+        }
+      });
+      bar.style.width = (remain / 30 * 100) + '%';
+      var sec = Math.ceil(remain);
+      if (sec !== belt.shownSec) { belt.shownSec = sec; left.textContent = '剩 ' + sec + ' 秒'; }
+      if (remain <= 0) { stopBelt(); finishTurn(); return; }
+      belt.raf = requestAnimationFrame(frame);
+    }
+    belt.raf = requestAnimationFrame(frame);
+  }
+
+  /* ---------- find the mistakes ---------- */
+  function findView() {
+    var c = st.cur, p = st.players[st.turn];
+    var done = c.found.length >= c.wrong.length || c.strikes >= 3;
+    var lives = h('span', { class: 'lives', role: 'img', 'aria-label': '還有 ' + (3 - c.strikes) + ' 次機會' }, [0, 1, 2].map(function (i) { return h('i', { class: i < 3 - c.strikes ? '' : 'off' }); }));
+    var grid = h('div', { class: 'fgrid' }, BIN_ORDER.map(function (b) {
+      var d = BINS[b];
+      return h('section', { class: 'fcol' },
+        h('h2', { class: 'fhead ' + d.cls }, h('span', { class: 'ic', html: d.icon }), d.name),
+        h('div', { class: 'ftiles' }, c.cols[b].map(function (id) {
+          var it = BY_ID[id], fixed = c.found.indexOf(id) >= 0;
+          return h('button', { class: 'ftile' + (fixed ? ' ok' : '') + (c.shake === id ? ' shake' : ''), disabled: fixed || done, 'aria-label': it.name, onclick: function () { tapTile(id); } },
+            h('span', { html: itemSvg(it) }), it.name, fixed ? h('span', { class: 'okb' }, '搬好了') : null);
+        })));
+    }));
+    c.shake = null;
+    return h('main', {},
+      hint(p.name + '，哪些放錯桶子了？', '點一下放錯的東西。找到 ' + c.found.length + ' / ' + c.wrong.length + ' 個・機會 '),
+      h('div', { class: 'row' }, lives, h('div', { class: 'grow' }),
+        h('button', { class: 'btn-big', onclick: finishTurn }, done ? (c.found.length >= c.wrong.length ? '全部找到了！看成績' : '看成績') : '我找完了')),
+      grid,
+      h('p', { class: 'msg ' + (c.msg ? (c.msg.ok ? 'ok' : 'no') : ''), role: 'status' }, c.msg ? c.msg.text : (done ? '' : '提示：有 ' + c.wrong.length + ' 件放錯了。')),
+      null
+    );
+  }
+  function tapTile(id) {
+    var c = st.cur; if (st.screen !== 'play' || c.kind !== 'find' || c.over) return;
+    var it = BY_ID[id];
+    if (c.wrong.indexOf(id) >= 0) {
+      BIN_ORDER.forEach(function (b) { var i = c.cols[b].indexOf(id); if (i >= 0) c.cols[b].splice(i, 1); });
+      c.cols[it.bin].push(id); c.found.push(id);
+      record('item', id, true);
+      c.msg = { ok: true, text: '好眼力！' + it.name + ' 要丟「' + BINS[it.bin].name + '」。' + it.why };
+      good();
+    } else {
+      c.strikes++; c.shake = id;
+      record('item', id, false);
+      c.msg = { ok: false, text: it.name + ' 放對了喔，本來就要丟「' + BINS[it.bin].name + '」。' };
+      bad();
+    }
+    save(); sync(); render();
+  }
+
+  /* ---------- turn summary + round ---------- */
+  function sumRow(e) {
+    if (e.kind === 'r4') {
+      var sc = SC_BY[e.id], r = RS[sc.r];
+      return h('div', { class: 'sumrow' }, h('div', { class: 'mini', html: r.icon }), h('span', {}, sc.q, '　→ ', r.name));
+    }
+    var it = BY_ID[e.id];
+    return h('div', { class: 'sumrow' }, h('div', { class: 'mini', html: itemSvg(it) }), h('span', {}, it.name, ' 要丟 ', tag(it.bin), e.unfound ? '（沒找到）' : ''));
+  }
+  function turnsumView() {
+    var p = st.players[st.turn];
+    var wrong = st.turnLog.filter(function (e) { return !e.ok && !e.skipped; });
+    var last = st.turn + 1 >= st.players.length;
+    return h('main', {}, h('div', { class: 'center' },
+      h('span', { class: 'pill' }, gameOf(st.game).name),
+      h('h1', {}, p.name + ' 得到 ' + st.turnPts + ' 分'),
+      st.turnSkipped ? h('p', { class: 'sub' }, '漏掉了 ' + st.turnSkipped + ' 件，下次加油！') : null,
+      wrong.length ? h('div', { class: 'result no' }, h('p', { class: 'why' }, '這些要記住：'), h('div', { class: 'sumlist' }, wrong.map(sumRow)))
+        : h('p', { class: 'sub' }, st.turnLog.length ? '全部答對，太棒了！' : '下一位加油！'),
+      h('button', { class: 'btn-big', onclick: function () {
+        st.cur = null; st.last = null;
+        if (last) st.screen = 'round'; else { st.turn++; st.screen = 'ready'; }
+        save(); render();
+      } }, last ? '看這一輪的成績' : '換下一位')
+    ));
+  }
+  function roundView() {
+    var max = Math.max(1, Math.max.apply(null, st.players.map(function (p) { return p.points; })));
+    return h('main', {}, h('div', { class: 'center' },
+      h('span', { class: 'pill' }, '第 ' + st.round + ' 輪結束'),
+      h('h1', {}, '大家都玩完了！'),
+      h('div', { class: 'plist' }, st.players.map(function (p) {
+        return h('div', { class: 'prow' }, h('span', {}, p.name), h('div', { class: 'bar' }, h('i', { style: 'width:' + (p.points / max * 100) + '%' })), h('span', { class: 'pt' }, p.points));
+      })),
+      h('p', { class: 'sub' }, '第 ' + st.group + ' 組一共 ' + st.points + ' 分'),
+      h('button', { class: 'btn-big', onclick: function () { st.round++; st.turn = 0; st.screen = 'ready'; save(); render(); } }, '再玩一輪')
+    ));
+  }
+
+  function tabletView() {
+    var main, c = st.cur;
+    if (st.screen === 'ready' && st.players.length) main = readyView();
+    else if (st.screen === 'play' && c) main = c.kind === 'sort' ? sortView() : c.kind === 'tf' ? tfView() : c.kind === 'r4' ? r4View() : c.kind === 'find' ? findView() : beltView();
+    else if (st.screen === 'feedback' && c && st.last) main = feedbackView();
+    else if (st.screen === 'turnsum' && st.players.length) main = turnsumView();
+    else if (st.screen === 'round' && st.players.length) main = roundView();
+    else main = setupView();
+    return [h('header', { class: 'top', id: 'top' }, topBar().filter(Boolean)), h('div', { class: 'coopbar', id: 'coop', hidden: true }), main];
+  }
+
+  /* ---------- teacher board ---------- */
+  var BM = 'garbage-board-manual-v1';
+  var manual = lsGet(BM) || {};
+  var live = {};
+  var unsubBoard = null, canReset = true, confirming = false, boardEl = null, prevTotal = null;
+
+  function boardData() {
+    var src = db ? live : manual, out = [];
+    Object.keys(src).forEach(function (k) { var g = src[k]; out.push({ n: g.group || Number(k), points: g.points || 0, played: g.played || 0, correct: g.correct || 0, misses: g.misses || {} }); });
+    return out;
+  }
+  function missInfo(id) {
+    if (SC_BY[id]) { var sc = SC_BY[id], r = RS[sc.r]; return { name: sc.q, svg: r.icon, right: r.name }; }
+    var it = BY_ID[id]; return it ? { name: it.name, svg: itemSvg(it), right: BINS[it.bin].name } : null;
+  }
+  function controls(isManual) {
+    var kids = [];
+    if (!isManual && dbState === 'ready') {
+      kids.push(h('span', { class: 'lab' }, '目前玩法'));
+      GAMES.forEach(function (g) { kids.push(h('button', { class: 'seg', 'aria-pressed': String(cfg.game === g.id), onclick: function () { setCfg({ game: g.id }); } }, g.name)); });
+    }
+    kids.push(h('span', { class: 'lab' }, '模式'));
+    kids.push(h('button', { class: 'seg', 'aria-pressed': String(!cfg.coop), onclick: function () { setCfg({ coop: false }); } }, '各組競賽'));
+    kids.push(h('button', { class: 'seg', 'aria-pressed': String(!!cfg.coop), onclick: function () { setCfg({ coop: true }); } }, '全班合作'));
+    if (cfg.coop) {
+      kids.push(h('span', { class: 'goal' }, '目標 ',
+        h('button', { class: 'btn-sm', 'aria-label': '目標減 5 分', onclick: function () { setCfg({ goal: Math.max(5, cfg.goal - 5) }); } }, '−5'),
+        h('b', {}, cfg.goal),
+        h('button', { class: 'btn-sm', 'aria-label': '目標加 5 分', onclick: function () { setCfg({ goal: cfg.goal + 5 }); } }, '+5'), ' 分'));
+    }
+    return h('section', { class: 'card' }, h('div', { class: 'ctl' }, kids));
+  }
+  function paintBoard() {
+    if (!boardEl) return;
+    var rows = boardData(), isManual = !db && dbState !== 'pending';
+    if (isManual) { for (var n = 1; n <= GROUPS.length; n++) if (!rows.some(function (r) { return r.n === n; })) rows.push({ n: n, points: 0, played: 0, correct: 0, misses: {} }); }
+    rows.sort(function (a, b) { return b.points - a.points || a.n - b.n; });
+    var total = rows.reduce(function (s, r) { return s + r.points; }, 0);
+    var max = Math.max(1, rows.reduce(function (m, r) { return Math.max(m, r.points); }, 0));
+    var top = rows.length && rows[0].points > 0 && !cfg.coop ? rows[0].points : -1;
+    if (cfg.coop && prevTotal != null && prevTotal < cfg.goal && total >= cfg.goal) confetti();
+    prevTotal = total;
+
+    var list = rows.length ? rows.map(function (r) {
+      var pct = r.played ? Math.round(r.correct / r.played * 100) : null;
+      return h('div', { class: 'grow-row' },
+        h('div', { class: 'chip', style: 'background:' + gcolor(r.n) }, '第 ' + r.n + ' 組'),
+        h('div', { class: 'bar', role: 'img', 'aria-label': '第 ' + r.n + ' 組 ' + r.points + ' 分' }, h('i', { style: 'width:' + (r.points / max * 100) + '%;background:' + gcolor(r.n) })),
+        isManual ? h('div', { class: 'pts adjcell' },
+          h('button', { class: 'btn-sm', 'aria-label': '第 ' + r.n + ' 組減 1 分', onclick: function () { adjust(r.n, -1); } }, '−'),
+          h('span', {}, r.points),
+          h('button', { class: 'btn-sm', 'aria-label': '第 ' + r.n + ' 組加 1 分', onclick: function () { adjust(r.n, 1); } }, '+'))
+          : h('div', { class: 'pts' }, r.points),
+        isManual ? null : h('div', { class: 'meta' }, (r.points === top ? '目前領先・' : '') + '玩了 ' + r.played + ' 題' + (pct != null ? '，答對 ' + pct + '%' : '')));
+    }) : [h('p', { class: 'empty' }, dbState === 'pending' ? '連線中…' : '等一下，各組平板選好組別後，分數會出現在這裡。')];
+
+    var miss = {};
+    rows.forEach(function (r) { Object.keys(r.misses).forEach(function (id) { miss[id] = (miss[id] || 0) + r.misses[id]; }); });
+    var worst = Object.keys(miss).filter(function (id) { return missInfo(id); }).sort(function (a, b) { return miss[b] - miss[a]; }).slice(0, 4);
+
+    var energy = null;
+    if (cfg.coop) {
+      var pct2 = Math.min(100, total / Math.max(1, cfg.goal) * 100);
+      energy = h('section', { class: 'card energy' }, h('h2', {}, '地球能量'),
+        h('div', { class: 'track', role: 'img', 'aria-label': '全班 ' + total + ' 分，目標 ' + cfg.goal + ' 分' }, h('i', { style: 'width:' + pct2 + '%' })),
+        h('p', { class: 'big' }, total + ' / ' + cfg.goal + ' 分'),
+        total >= cfg.goal ? h('p', { class: 'win' }, '闖關成功！全班一起做到了！') : h('p', { class: 'empty' }, '還差 ' + (cfg.goal - total) + ' 分，大家一起加油！'));
+    }
+
+    boardEl.replaceChildren.apply(boardEl, [
+      h('div', { class: 'board-head' }, h('h1', {}, '垃圾分類大挑戰'), h('div', { class: 'total', role: 'status' }, h('span', {}, '全班累積分數'), h('b', {}, total))),
+      controls(isManual),
+      energy,
+      h('div', { class: 'grid2' },
+        h('section', { class: 'card' }, h('h2', {}, '各組分數'), list),
+        h('section', { class: 'card' }, h('h2', {}, '最容易答錯'),
+          worst.length ? worst.map(function (id) {
+            var mi = missInfo(id);
+            return h('div', { class: 'miss' }, h('div', { class: 'mini', html: mi.svg }), h('p', {}, mi.name, h('br'), h('small', {}, '答錯 ' + miss[id] + ' 次・正確是' + mi.right)));
+          }) : h('p', { class: 'empty' }, '還沒有人答錯。'))
+      ),
+      h('div', { class: 'row' },
+        h('span', { class: 'status' }, isManual ? '單機模式：請老師用 +、− 手動記分，玩法請各組在平板上選。' : (dbState === 'pending' ? '連線中…' : '即時連線中，各組答題後分數會自動更新。')),
+        h('div', { class: 'grow' }),
+        canReset ? (confirming
+          ? h('div', { class: 'confirm' }, h('span', {}, '確定要全部歸零嗎？'),
+            h('button', { class: 'btn-sm', onclick: doReset }, '確定歸零'),
+            h('button', { class: 'btn-sm', onclick: function () { confirming = false; paintBoard(); } }, '取消'))
+          : h('button', { class: 'btn-sm', onclick: function () { confirming = true; paintBoard(); } }, '全部歸零')) : null,
+        h('a', { class: 'link', href: '#' }, '回到小朋友畫面'))
+    ].filter(Boolean));
+  }
+  function adjust(n, d) {
+    var g = manual[n] || { group: n, points: 0, played: 0, correct: 0, misses: {} };
+    g.points = Math.max(0, (g.points || 0) + d); manual[n] = g; lsSet(BM, manual); paintBoard();
+  }
+  function doReset() {
+    confirming = false; prevTotal = null;
+    if (!db) { manual = {}; lsSet(BM, manual); paintBoard(); return; }
+    db.collection('scores').get().then(function (s) { return Promise.all(s.docs.map(function (d) { return db.doc('scores/' + d.id).delete(); })); })
+      .then(function () { live = {}; paintBoard(); }).catch(function () { paintBoard(); });
+  }
+  function startBoard() {
+    boardEl = h('div', { class: 'app', style: 'min-height:0' });
+    paintBoard();
+    if (db && !unsubBoard) {
+      unsubBoard = db.collection('scores').onSnapshot(function (s) {
+        live = {};
+        s.docs.forEach(function (d) { live[d.id] = d.data(); });
+        paintBoard();
+      }, function () { });
+    }
+    return h('main', {}, boardEl);
+  }
+  function stopBoard() { if (unsubBoard) { unsubBoard(); unsubBoard = null; } boardEl = null; }
+
+  /* ---------- router ---------- */
+  function isBoard() { return location.hash === '#board'; }
+  function render() {
+    stopBelt();
+    if (isBoard()) {
+      root.replaceChildren(startBoard());
+    } else {
+      stopBoard();
+      root.replaceChildren.apply(root, tabletView());
+      paintCoop();
+    }
+  }
+  window.addEventListener('hashchange', function () { stopBoard(); render(); });
+
+  render();
+
+  /* ---------- optional Supabase backend (used on GitHub Pages; the Claude page uses its own db) ---------- */
+  function supaDb() {
+    var C = window.GAME_SUPABASE || {};
+    if (!C.url || !C.key || /你的|YOUR/i.test(C.url + C.key)) return null;
+    var base = C.url.replace(/\/+$/, '') + '/rest/v1/kv';
+    var H = { apikey: C.key, Authorization: 'Bearer ' + C.key, 'Content-Type': 'application/json' };
+    var cache = {}, touched = {}, loaded = false, subs = [], timer = null;
+    function fire() { if (loaded) subs.slice().forEach(function (f) { try { f(); } catch (e) { /* listener errors must not stop polling */ } }); }
+    function poll() {
+      return fetch(base + '?select=path,data', { headers: H }).then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); }).then(function (rows) {
+        var next = {}, now = Date.now();
+        rows.forEach(function (r) { next[r.path] = r.data; });
+        // keep our own very recent writes/deletes: a poll that started before them must not undo them
+        Object.keys(touched).forEach(function (p) {
+          if (now - touched[p].t < 4000) { if (touched[p].del) delete next[p]; else next[p] = touched[p].v; } else delete touched[p];
+        });
+        cache = next; loaded = true; fire();
+      }).catch(function () { /* offline: keep last known data */ });
+    }
+    function ensure() { if (!timer) { poll(); timer = setInterval(poll, 2000); } }
+    function snap(p) { return { id: p.split('/').pop(), exists: p in cache, data: function () { return cache[p]; }, metadata: { fromCache: false, hasPendingWrites: false } }; }
+    function colSnap(c) {
+      var docs = Object.keys(cache).filter(function (p) { return p.indexOf(c + '/') === 0; }).map(snap);
+      return { docs: docs, size: docs.length, empty: !docs.length, metadata: {} };
+    }
+    function listen(make, cb) {
+      ensure();
+      var f = function () { cb(make()); };
+      subs.push(f); if (loaded) setTimeout(f, 0);
+      return function () { subs = subs.filter(function (x) { return x !== f; }); };
+    }
+    return {
+      doc: function (p) {
+        return {
+          get: function () { return poll().then(function () { return snap(p); }); },
+          set: function (d) {
+            var v = JSON.parse(JSON.stringify(d));
+            touched[p] = { t: Date.now(), v: v }; cache[p] = v; fire();
+            return fetch(base + '?on_conflict=path', { method: 'POST', headers: Object.assign({ Prefer: 'resolution=merge-duplicates,return=minimal' }, H), body: JSON.stringify({ path: p, data: v, updated_at: new Date().toISOString() }) })
+              .then(function (r) { if (!r.ok) throw new Error(r.status); });
+          },
+          delete: function () {
+            touched[p] = { t: Date.now(), del: true }; delete cache[p]; fire();
+            return fetch(base + '?path=eq.' + encodeURIComponent(p), { method: 'DELETE', headers: H }).then(function (r) { if (!r.ok) throw new Error(r.status); });
+          },
+          onSnapshot: function (cb) { return listen(function () { return snap(p); }, cb); }
+        };
+      },
+      collection: function (c) {
+        return {
+          get: function () { return poll().then(function () { return colSnap(c); }); },
+          onSnapshot: function (cb) { return listen(function () { return colSnap(c); }, cb); }
+        };
+      }
+    };
+  }
+
+  /* ---------- runtime capabilities (optional: the page works without them) ---------- */
+  (window.claude && window.claude.use ? window.claude.use('db') : Promise.resolve(null)).then(function (d) { return d || supaDb(); }).then(function (d) {
+    db = d; dbState = d ? 'ready' : 'none';
+    if (d) { net = 'ok'; sync(); watchOwn(); watchCfg(); watchTotals(); }
+    if (isBoard()) { stopBoard(); render(); } else if (st.screen === 'setup') { render(); } else { paintTop(); paintCoop(); }
+  }).catch(function () { dbState = 'none'; if (isBoard()) paintBoard(); else paintTop(); });
+  (window.claude && window.claude.use ? window.claude.use('user') : Promise.resolve(null)).then(function (u) {
+    if (u && u.canEdit) return u.canEdit().then(function (v) { canReset = v !== false; if (boardEl) paintBoard(); });
+  }).catch(function () { });
+})();
+</script>
+
+</body></html>
