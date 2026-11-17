@@ -163,6 +163,22 @@ a.link { color: var(--accent); font-size: 20px; }
   .beltmode .bitem svg { width: 80px; height: 80px; }
 }
 
+/* special questions */
+.odd { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; flex: 1; align-content: center; }
+.oddbtn { background: var(--stage); color: #23302a; border: 5px solid transparent; border-radius: 26px; padding: 14px 8px 18px; display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: clamp(24px, 3.2vw, 38px); box-shadow: 0 8px 0 rgba(0,0,0,.12); min-height: 240px; }
+.oddbtn svg { width: clamp(100px, 18vh, 190px); height: clamp(100px, 18vh, 190px); pointer-events: none; }
+.popts { display: grid; gap: 14px; }
+.pbtn { background: var(--surface); border: 4px solid var(--line); border-radius: 22px; padding: 14px 26px; text-align: left; font-size: clamp(26px, 3.6vw, 40px); display: flex; gap: 20px; align-items: center; min-height: 84px; }
+.pbtn b { background: var(--accent); color: var(--on-accent); border-radius: 50%; width: 52px; height: 52px; display: grid; place-items: center; font-weight: 400; flex: none; }
+.parts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; flex: 1; align-content: center; }
+.part { background: var(--surface); border: 3px solid var(--line); border-radius: 24px; padding: 14px; display: flex; flex-direction: column; align-items: center; gap: 8px; min-width: 0; }
+.part p { font-size: clamp(24px, 3vw, 34px); text-align: center; }
+.part .mini { width: 120px; height: 120px; }
+.pbins { display: grid; gap: 8px; width: 100%; }
+.pbin { border: 5px solid transparent; border-radius: 16px; color: #fff; font-size: clamp(20px, 2.6vw, 28px); min-height: 56px; }
+.pbin[aria-pressed="true"] { border-color: #fff; box-shadow: 0 0 0 5px var(--ink); }
+@media (max-width: 560px) { .odd { grid-template-columns: repeat(2, 1fr); } .parts { grid-template-columns: 1fr; } .part { flex-direction: row; flex-wrap: wrap; justify-content: center; } .pbins { grid-template-columns: repeat(3, 1fr); } }
+
 /* feedback + summary */
 .result { background: var(--surface); border: 4px solid var(--line); border-radius: 32px; padding: 22px 30px; display: flex; flex-direction: column; align-items: center; gap: 12px; text-align: center; max-width: 860px; width: 100%; }
 .result.ok { border-color: var(--good); } .result.no { border-color: var(--bad); }
@@ -318,7 +334,28 @@ a.link { color: var(--accent); font-size: 20px; }
     { id: 'dirtybag', adv: true, name: '沾到油的塑膠袋', bin: 'trash', why: '沾到油的塑膠袋髒了，不能回收，丟一般垃圾。',
       svg: '<path d="M58 68h84l12 104H46z" fill="#e8d9b0" ' + SW + '/><path d="M80 68c0-36 40-36 40 0" fill="none" ' + SW + '/><ellipse cx="86" cy="112" rx="14" ry="10" fill="#a0652a" opacity="0.6"/><ellipse cx="124" cy="140" rx="16" ry="11" fill="#a0652a" opacity="0.6"/>' },
     { id: 'eraser', adv: true, name: '橡皮擦', bin: 'trash', why: '橡皮擦不能回收，丟一般垃圾。',
-      svg: '<g transform="rotate(-20 100 100)"><rect x="32" y="66" width="136" height="68" rx="12" fill="#fff" ' + SW + '/><rect x="32" y="66" width="52" height="68" rx="12" fill="#ee7a66" ' + SW + '/><path d="M84 66v68" stroke="#1b1b1b" stroke-width="5"/></g>' }
+      svg: '<g transform="rotate(-20 100 100)"><rect x="32" y="66" width="136" height="68" rx="12" fill="#fff" ' + SW + '/><rect x="32" y="66" width="52" height="68" rx="12" fill="#ee7a66" ' + SW + '/><path d="M84 66v68" stroke="#1b1b1b" stroke-width="5"/></g>' },
+
+    { id: 'paperbag', adv: true, name: '乾淨的紙袋', bin: 'recycle', why: '乾淨的紙袋是紙類，可以回收。',
+      svg: '<path d="M50 70h100l8 106H42z" fill="#c8924f" ' + SW + '/><path d="M50 70l50 28 50-28" fill="none" ' + SW + '/><path d="M80 70c0-34 40-34 40 0" fill="none" ' + SW + '/>' },
+    { id: 'battery', adv: true, name: '廢乾電池', bin: 'recycle', why: '廢電池有重金屬，要放進資源回收，不能丟一般垃圾。',
+      svg: '<rect x="62" y="40" width="76" height="130" rx="10" fill="#2f9e5b" ' + SW + '/><rect x="86" y="22" width="28" height="20" rx="4" fill="#cfd4dc" ' + SW + '/><rect x="62" y="72" width="76" height="40" fill="#ffd24d" ' + SW + '/><path d="M100 124l-12 20h24l-12 20" fill="none" stroke="#fff" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>' },
+    { id: 'disc', adv: true, name: '光碟片', bin: 'recycle', why: '光碟片可以回收，不要丟一般垃圾。',
+      svg: '<circle cx="100" cy="100" r="76" fill="#cfe4ff" ' + SW + '/><circle cx="100" cy="100" r="22" fill="#fff" ' + SW + '/><path d="M44 80a60 60 0 0 1 48-36" fill="none" stroke="#fff" stroke-width="7" stroke-linecap="round"/>' },
+    { id: 'eggtray', adv: true, name: '紙蛋盒', bin: 'recycle', why: '乾淨的紙蛋盒是紙類，可以回收。',
+      svg: '<path d="M30 136c0-44 30-44 30 0M85 136c0-44 30-44 30 0M140 136c0-44 30-44 30 0" fill="#d6cfc0" ' + SW + '/><rect x="24" y="136" width="152" height="30" rx="6" fill="#c9c0aa" ' + SW + '/>' },
+    { id: 'noodle', adv: true, name: '吃剩的麵條', bin: 'food', why: '吃剩的麵條是廚餘。',
+      svg: '<path d="M30 112h140c0 42-28 66-70 66s-70-24-70-66z" fill="#5b8bd9" ' + SW + '/><path d="M42 112c10-30 24-30 34 0s24 30 34 0 24-30 34 0 14 20 14 0" fill="none" stroke="' + K + '" stroke-width="22" stroke-linecap="round"/><path d="M42 112c10-30 24-30 34 0s24 30 34 0 24-30 34 0 14 20 14 0" fill="none" stroke="#f3d9a8" stroke-width="12" stroke-linecap="round"/>' },
+    { id: 'veg', adv: true, name: '吃剩的青菜', bin: 'food', why: '吃剩的菜是廚餘。',
+      svg: '<ellipse cx="100" cy="134" rx="78" ry="30" fill="#fff" ' + SW + '/><path d="M50 128c10-34 32-34 38-8M88 122c10-34 36-32 42-4M122 128c8-22 26-22 32-4" fill="#6bb04a" stroke="' + K + '" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="104" cy="138" r="10" fill="#f59f00" stroke="' + K + '" stroke-width="4"/>' },
+    { id: 'okara', adv: true, name: '豆渣', bin: 'food', why: '豆渣是食物殘渣，是廚餘。',
+      svg: '<path d="M30 160c6-48 32-72 70-72s64 24 70 72z" fill="#f3e3b3" ' + SW + '/><circle cx="70" cy="128" r="4" fill="#d9c27a"/><circle cx="104" cy="112" r="4" fill="#d9c27a"/><circle cx="132" cy="136" r="4" fill="#d9c27a"/><ellipse cx="64" cy="70" rx="14" ry="18" fill="#e3b778" ' + SW + '/>' },
+    { id: 'bone', adv: true, name: '大骨頭', bin: 'trash', why: '又大又硬的骨頭不是廚餘，要丟一般垃圾。',
+      svg: '<g transform="rotate(-30 100 100)"><rect x="50" y="86" width="100" height="28" fill="#f2efe4" ' + SW + '/><circle cx="52" cy="82" r="16" fill="#f2efe4" ' + SW + '/><circle cx="52" cy="118" r="16" fill="#f2efe4" ' + SW + '/><circle cx="148" cy="82" r="16" fill="#f2efe4" ' + SW + '/><circle cx="148" cy="118" r="16" fill="#f2efe4" ' + SW + '/><rect x="52" y="88" width="96" height="24" fill="#f2efe4"/></g>' },
+    { id: 'shell', adv: true, name: '貝殼', bin: 'trash', why: '貝殼又重又硬，不是廚餘，丟一般垃圾。',
+      svg: '<path d="M100 170L36 112C26 70 60 38 100 38s74 32 64 74z" fill="#f3d9c8" ' + SW + '/><path d="M100 170L72 50M100 170V40M100 170L128 50M100 170L48 82M100 170L152 82" fill="none" stroke="' + K + '" stroke-width="4" stroke-linecap="round"/>' },
+    { id: 'swab', adv: true, name: '棉花棒', bin: 'trash', why: '用過的棉花棒丟一般垃圾。',
+      svg: '<g transform="rotate(-35 100 100)"><rect x="30" y="94" width="140" height="12" rx="6" fill="#e8ecf0" ' + SW + '/><ellipse cx="38" cy="100" rx="20" ry="13" fill="#fff" ' + SW + '/><ellipse cx="162" cy="100" rx="20" ry="13" fill="#fff" ' + SW + '/></g>' }
   ];
   var BY_ID = {};
   ITEMS.forEach(function (it) { BY_ID[it.id] = it; });
@@ -364,14 +401,57 @@ a.link { color: var(--accent); font-size: 20px; }
 
   /* ---------- games ---------- */
   var GAMES = [
-    { id: 'mix', name: '綜合', how: function (a) { return '每人 ' + (a ? 8 : 6) + ' 題，分類、對或錯、4R 情境混在一起，要看清楚題目喔！'; } },
+    { id: 'mix', name: '綜合', how: function (a) { return '每人 ' + (a ? 8 : 6) + ' 題，分類、對或錯、4R 情境' + (a ? '，還有特殊題' : '') + '混在一起，要看清楚題目喔！'; } },
     { id: 'sort', name: '分類', how: function (a) { return '每人 ' + (a ? 4 : 3) + ' 題。把物品拖進正確的桶子。'; } },
     { id: 'belt', name: '輸送帶', how: function (a) { return '30 秒內，把輸送帶上的垃圾拖進正確的桶子，別讓它掉下去！' + (a ? '進階的速度更快喔。' : ''); } },
     { id: 'find', name: '找出放錯的', how: function (a) { return '桶子裡有 ' + (a ? 4 : 3) + ' 件放錯了，點出來幫它搬家。猜錯 3 次就結束。'; } },
     { id: 'tf', name: '對或錯', how: function (a) { return '每人 ' + (a ? 6 : 5) + ' 題。看看這句話說得對不對。'; } },
+    { id: 'chal', name: '特殊挑戰', how: function () { return '每人 5 題特別的題目：哪一個不一樣、回收前要先做什麼、拆一拆分到不同的桶子。'; } },
     { id: 'r4', name: '4R 情境', how: function (a) { return '每人 ' + (a ? 4 : 3) + ' 題。選出這是哪一種 R。'; } }
   ];
   function gameOf(id) { for (var i = 0; i < GAMES.length; i++) if (GAMES[i].id === id) return GAMES[i]; return GAMES[0]; }
+
+  /* ---------- special questions (advanced) ---------- */
+  var PREP = [
+    { id: 'p1', item: 'milk', q: '牛奶盒要回收，要先做什麼？', opts: ['洗乾淨、壓扁', '直接丟，不用處理', '撕成小碎片'], why: '洗乾淨、壓扁的鋁箔包才能回收。' },
+    { id: 'p2', item: 'pet', q: '寶特瓶要回收，要先做什麼？', opts: ['倒乾淨、壓扁', '裝滿水再丟', '直接丟，不用處理'], why: '瓶子裡的飲料要倒乾淨，壓扁比較省空間。' },
+    { id: 'p3', item: 'box', q: '紙箱要回收，要先做什麼？', opts: ['壓扁，盡量撕掉膠帶', '裝滿垃圾再丟', '用水泡濕'], why: '壓扁才好搬運，膠帶撕掉更好回收。' },
+    { id: 'p4', item: 'glass', q: '玻璃瓶要回收，要先做什麼？', opts: ['倒乾淨、洗一洗，小心別打破', '先把它打破', '直接丟，不用處理'], why: '玻璃瓶洗乾淨再回收，打破會割傷人。' },
+    { id: 'p5', item: 'can', q: '喝完的鋁罐要回收，要先做什麼？', opts: ['倒乾淨、洗一洗、壓扁', '連剩下的飲料一起丟', '直接丟，不用處理'], why: '罐子裡不要有剩的飲料，壓扁比較好收。' },
+    { id: 'p6', item: 'rice', q: '剩飯要丟廚餘桶，要先做什麼？', opts: ['瀝乾水分', '連湯帶水一起倒', '連塑膠袋一起丟'], why: '廚餘越乾，越不容易發臭。' },
+    { id: 'p7', item: 'news', q: '舊報紙要回收，要保持什麼？', opts: ['乾燥、整理綁好', '泡濕再丟', '沾上油再丟'], why: '紙類要保持乾淨乾燥才能回收。' }
+  ];
+  var PREP_BY = {};
+  PREP.forEach(function (p) { PREP_BY['prep_' + p.id] = p; });
+  var COMBOS = [
+    { id: 'c1', title: '午餐吃完了，桌上剩下三樣東西', parts: ['rice', 'chop', 'pet'] },
+    { id: 'c2', title: '生日派對結束了，桌上剩下三樣東西', parts: ['box', 'snack', 'bread'] },
+    { id: 'c3', title: '早餐吃完了，桌上剩下三樣東西', parts: ['milk', 'straw', 'banana'] }
+  ];
+  function makeSpecial(t) {
+    if (t === 'odd') {
+      var major = pick(BIN_ORDER), p = pool();
+      var same = shuffle(p.filter(function (i) { return i.bin === major; })).slice(0, 3);
+      var odd = pick(p.filter(function (i) { return i.bin !== major; }));
+      return { t: 'odd', major: major, odd: odd.id, ids: shuffle(same.concat([odd]).map(function (i) { return i.id; })) };
+    }
+    if (t === 'prep') { var pr = pick(PREP); return { t: 'prep', id: pr.id, order: shuffle([0, 1, 2]), pick: null }; }
+    var cb = pick(COMBOS);
+    return { t: 'combo', id: cb.id, parts: shuffle(cb.parts), pick: {} };
+  }
+  function buildMixed(types) {
+    var N = types.length, its = shuffle(pool()), sc = shuffle(scenPool()), ii = 0, ri = 0;
+    var c = { kind: types[0], n: N, q: 0, types: types, ids: [], qs: [], rids: [], sp: [] };
+    types.forEach(function (t) {
+      var id = null, qq = null, rid = null, spc = null;
+      if (t === 'r4') rid = sc[ri++].id;
+      else if (t === 'sort') id = its[ii++].id;
+      else if (t === 'tf') { var it = its[ii++]; qq = { id: it.id, shown: Math.random() < 0.5 ? it.bin : pick(BIN_ORDER.filter(function (b) { return b !== it.bin; })) }; }
+      else spc = makeSpecial(t);
+      c.ids.push(id); c.qs.push(qq); c.rids.push(rid); c.sp.push(spc);
+    });
+    return c;
+  }
 
   /* ---------- groups ---------- */
   var GROUPS = ['#c93c30', '#b86a00', '#2f7d3b', '#1f7f86', '#2b6fc4', '#7d4fb8', '#b83a83', '#7a5238'];
@@ -555,17 +635,9 @@ a.link { color: var(--accent); font-size: 20px; }
     } else if (g === 'r4') {
       st.cur = { kind: 'r4', n: isAdv() ? 4 : 3, q: 0, rids: shuffle(scenPool()).slice(0, isAdv() ? 4 : 3).map(function (s) { return s.id; }) };
     } else if (g === 'mix') {
-      var N = isAdv() ? 8 : 6, types = shuffle(isAdv() ? ['sort', 'sort', 'sort', 'tf', 'tf', 'tf', 'r4', 'r4'] : ['sort', 'sort', 'tf', 'tf', 'r4', 'r4']), its = shuffle(pool()), sc = shuffle(scenPool()), ii = 0, ri = 0;
-      var c = { kind: types[0], n: N, q: 0, types: types, ids: [], qs: [], rids: [] };
-      types.forEach(function (t) {
-        if (t === 'r4') { c.rids.push(sc[ri++].id); c.ids.push(null); c.qs.push(null); }
-        else {
-          var it = its[ii++]; c.rids.push(null);
-          if (t === 'sort') { c.ids.push(it.id); c.qs.push(null); }
-          else { c.ids.push(null); c.qs.push({ id: it.id, shown: Math.random() < 0.5 ? it.bin : pick(BIN_ORDER.filter(function (b) { return b !== it.bin; })) }); }
-        }
-      });
-      st.cur = c;
+      st.cur = buildMixed(shuffle(isAdv() ? ['sort', 'sort', 'tf', 'tf', 'r4', 'odd', 'prep', 'combo'] : ['sort', 'sort', 'tf', 'tf', 'r4', 'r4']));
+    } else if (g === 'chal') {
+      st.cur = buildMixed(shuffle(['odd', 'odd', 'prep', 'prep', 'combo']));
     } else if (g === 'find') {
       st.cur = makeScene();
     } else {
@@ -786,12 +858,81 @@ a.link { color: var(--accent); font-size: 20px; }
     afterAnswer(ok);
   }
 
+  /* odd one out */
+  function spec() { return st.cur.sp[st.cur.q]; }
+  function oddView() {
+    var sp = spec(), p = st.players[st.turn];
+    return h('main', {}, hint(p.name + '，哪一個要丟的桶子和其他三個不一樣？', progress() + '・點一下你覺得不一樣的那個'),
+      h('div', { class: 'odd' }, sp.ids.map(function (id) {
+        var it = BY_ID[id];
+        return h('button', { class: 'oddbtn', 'aria-label': it.name, onclick: function () { answerOdd(id); } }, h('span', { html: itemSvg(it) }), it.name);
+      })));
+  }
+  function answerOdd(id) {
+    if (st.screen !== 'play' || st.cur.kind !== 'odd') return;
+    var sp = spec(), ok = id === sp.odd;
+    record('item', sp.odd, ok);
+    afterAnswer(ok);
+  }
+  /* prep: what to do before recycling */
+  var LET = ['A', 'B', 'C'];
+  function prepView() {
+    var sp = spec(), pr = PREP.filter(function (x) { return x.id === sp.id; })[0], p = st.players[st.turn], it = BY_ID[pr.item];
+    return h('main', {}, hint(p.name + '，選一選', progress()),
+      h('div', { class: 'stage' }, h('div', { class: 'itemcard still', style: 'flex-direction:row;gap:28px;padding:18px 36px' }, h('div', { class: 'mini', style: 'width:150px;height:150px', html: itemSvg(it) }), h('div', { class: 'stmt' }, pr.q))),
+      h('div', { class: 'popts' }, sp.order.map(function (oi, k) {
+        return h('button', { class: 'pbtn', onclick: function () { answerPrep(oi === 0); } }, h('b', {}, LET[k]), pr.opts[oi]);
+      })));
+  }
+  function answerPrep(ok) {
+    if (st.screen !== 'play' || st.cur.kind !== 'prep') return;
+    record('prep', 'prep_' + spec().id, ok);
+    afterAnswer(ok);
+  }
+  /* combo: sort every part */
+  function comboView() {
+    var sp = spec(), cb = COMBOS.filter(function (x) { return x.id === sp.id; })[0], p = st.players[st.turn];
+    var all = sp.parts.every(function (id) { return sp.pick[id]; });
+    return h('main', {}, hint(p.name + '，' + cb.title, progress() + '・每一樣各丟哪個桶子？'),
+      h('div', { class: 'parts' }, sp.parts.map(function (id) {
+        var it = BY_ID[id];
+        return h('div', { class: 'part' }, h('div', { class: 'mini', html: itemSvg(it) }), h('p', {}, it.name),
+          h('div', { class: 'pbins' }, BIN_ORDER.map(function (b) {
+            return h('button', { class: 'pbin ' + BINS[b].cls, 'aria-pressed': String(sp.pick[id] === b), 'aria-label': it.name + '丟' + BINS[b].name, onclick: function () { sp.pick[id] = b; save(); render(); } }, BINS[b].name);
+          })));
+      })),
+      h('div', { class: 'row' }, h('div', { class: 'grow' }), h('button', { class: 'btn-big', disabled: !all, onclick: answerCombo }, '確定')));
+  }
+  function answerCombo() {
+    var c = st.cur, sp = spec();
+    if (st.screen !== 'play' || c.kind !== 'combo') return;
+    var okAll = true;
+    sp.parts.forEach(function (id) {
+      if (sp.pick[id] !== BY_ID[id].bin) { okAll = false; st.misses[id] = (st.misses[id] || 0) + 1; st.turnLog.push({ kind: 'item', id: id, ok: false }); }
+    });
+    st.played++;
+    if (okAll) { st.points++; st.correct++; st.turnPts++; st.players[st.turn].points++; }
+    afterAnswer(okAll);
+  }
+
   /* feedback card (sort / tf / 4R) */
   var CHECK = '<svg viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="29" fill="currentColor"/><path d="M18 33l10 10 19-21" fill="none" stroke="#fff" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/></svg>';
   var CROSS = '<svg viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="29" fill="currentColor"/><path d="M21 21l22 22M43 21L21 43" fill="none" stroke="#fff" stroke-width="7" stroke-linecap="round"/></svg>';
   function feedbackView() {
     var c = st.cur, ok = st.last.ok, what, why, extra = null, rightBin = null;
-    if (c.kind === 'r4') {
+    if (c.kind === 'odd') {
+      var osp = c.sp[c.q], oit = BY_ID[osp.odd];
+      what = [h('div', { class: 'mini', html: itemSvg(oit) }), h('span', {}, oit.name, ' 要丟 '), tag(oit.bin), h('span', {}, '，其他三個要丟 '), tag(osp.major)]; why = oit.why;
+    } else if (c.kind === 'prep') {
+      var psp = c.sp[c.q], ppr = PREP.filter(function (x) { return x.id === psp.id; })[0];
+      what = [h('div', { class: 'mini', html: itemSvg(BY_ID[ppr.item]) }), h('span', {}, '正確：' + ppr.opts[0])]; why = ppr.why;
+    } else if (c.kind === 'combo') {
+      var csp = c.sp[c.q];
+      what = [h('div', { class: 'sumlist' }, csp.parts.map(function (id) {
+        var it = BY_ID[id], good = csp.pick[id] === it.bin;
+        return h('div', { class: 'sumrow' }, h('div', { class: 'mini', html: itemSvg(it) }), h('span', {}, (good ? '✓ ' : '✗ ') + it.name + ' 要丟 ', tag(it.bin)));
+      }))]; why = ok ? '三樣都分對了！' : '分類要一樣一樣看清楚喔。';
+    } else if (c.kind === 'r4') {
       var sc = SC_BY['r4_' + c.rids[c.q]], r = RS[sc.r];
       what = [h('div', { class: 'mini', html: r.icon }), h('span', {}, '這是「' + r.name + '」')]; why = sc.why;
       extra = h('p', { class: 'q' }, sc.q);
@@ -936,6 +1077,10 @@ a.link { color: var(--accent); font-size: 20px; }
 
   /* ---------- turn summary + round ---------- */
   function sumRow(e) {
+    if (e.kind === 'prep') {
+      var pp = PREP_BY[e.id];
+      return h('div', { class: 'sumrow' }, h('div', { class: 'mini', html: itemSvg(BY_ID[pp.item]) }), h('span', {}, pp.q, '　→ ', pp.opts[0]));
+    }
     if (e.kind === 'r4') {
       var sc = SC_BY[e.id], r = RS[sc.r];
       return h('div', { class: 'sumrow' }, h('div', { class: 'mini', html: r.icon }), h('span', {}, sc.q, '　→ ', r.name));
@@ -976,7 +1121,7 @@ a.link { color: var(--accent); font-size: 20px; }
   function tabletView() {
     var main, c = st.cur;
     if (st.screen === 'ready' && st.players.length) main = readyView();
-    else if (st.screen === 'play' && c) main = c.kind === 'sort' ? sortView() : c.kind === 'tf' ? tfView() : c.kind === 'r4' ? r4View() : c.kind === 'find' ? findView() : beltView();
+    else if (st.screen === 'play' && c) main = c.kind === 'sort' ? sortView() : c.kind === 'tf' ? tfView() : c.kind === 'r4' ? r4View() : c.kind === 'odd' ? oddView() : c.kind === 'prep' ? prepView() : c.kind === 'combo' ? comboView() : c.kind === 'find' ? findView() : beltView();
     else if (st.screen === 'feedback' && c && st.last) main = feedbackView();
     else if (st.screen === 'turnsum' && st.players.length) main = turnsumView();
     else if (st.screen === 'round' && st.players.length) main = roundView();
@@ -996,6 +1141,7 @@ a.link { color: var(--accent); font-size: 20px; }
     return out;
   }
   function missInfo(id) {
+    if (PREP_BY[id]) { var pp = PREP_BY[id]; return { name: pp.q, svg: itemSvg(BY_ID[pp.item]), right: pp.opts[0] }; }
     if (SC_BY[id]) { var sc = SC_BY[id], r = RS[sc.r]; return { name: sc.q, svg: r.icon, right: r.name }; }
     var it = BY_ID[id]; return it ? { name: it.name, svg: itemSvg(it), right: BINS[it.bin].name } : null;
   }
