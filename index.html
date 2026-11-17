@@ -284,7 +284,41 @@ a.link { color: var(--accent); font-size: 20px; }
     { id: 'chop', name: '用過的免洗筷', bin: 'trash', why: '用過的免洗筷丟一般垃圾。',
       svg: '<g transform="rotate(-18 100 100)"><rect x="82" y="18" width="12" height="164" rx="5" fill="#e3b778" ' + SW + '/><rect x="106" y="18" width="12" height="164" rx="5" fill="#e3b778" ' + SW + '/><rect x="74" y="100" width="52" height="58" fill="#f2efe4" ' + SW + '/><path d="M86 118h28M86 134h28" stroke="#e0523f" stroke-width="5" stroke-linecap="round"/></g>' },
     { id: 'mask', name: '用過的口罩', bin: 'trash', why: '用過的口罩丟一般垃圾。',
-      svg: '<rect x="48" y="62" width="104" height="76" rx="18" fill="#cfe9ff" ' + SW + '/><path d="M48 84h104M48 100h104M48 116h104" stroke="#8fb6d9" stroke-width="5"/><path d="M48 76C26 76 22 100 30 118C34 126 44 128 48 124M152 76C174 76 178 100 170 118C166 126 156 128 152 124" fill="none" ' + SW + '/>' }
+      svg: '<rect x="48" y="62" width="104" height="76" rx="18" fill="#cfe9ff" ' + SW + '/><path d="M48 84h104M48 100h104M48 116h104" stroke="#8fb6d9" stroke-width="5"/><path d="M48 76C26 76 22 100 30 118C34 126 44 128 48 124M152 76C174 76 178 100 170 118C166 126 156 128 152 124" fill="none" ' + SW + '/>' },
+
+    /* ---- advanced items ---- */
+    { id: 'glass', adv: true, name: '玻璃瓶', bin: 'recycle', why: '洗乾淨的玻璃瓶可以回收，小心不要打破。',
+      svg: '<rect x="82" y="14" width="36" height="16" rx="4" fill="#9aa1ab" ' + SW + '/><path d="M88 30h24v26c0 8 26 14 26 38v70q0 12-12 12H74q-12 0-12-12V94c0-24 26-30 26-38z" fill="#bfe6d4" ' + SW + '/><rect x="62" y="108" width="76" height="44" fill="#fff" ' + SW + '/><path d="M76 130h48" stroke="#58b368" stroke-width="6" stroke-linecap="round"/>' },
+    { id: 'tincan', adv: true, name: '罐頭鐵罐', bin: 'recycle', why: '鐵罐頭洗乾淨、壓扁，可以回收。',
+      svg: '<path d="M44 62v90q0 14 56 14t56-14V62" fill="#d9dde3" ' + SW + '/><ellipse cx="100" cy="62" rx="56" ry="14" fill="#eceff3" ' + SW + '/><rect x="44" y="90" width="112" height="50" fill="#e0a020" ' + SW + '/><path d="M70 115h60" stroke="#fff" stroke-width="6" stroke-linecap="round"/>' },
+    { id: 'mag', adv: true, name: '雜誌', bin: 'recycle', why: '乾淨的紙類可以回收，雜誌和書本也可以。',
+      svg: '<rect x="48" y="24" width="104" height="152" rx="6" fill="#ee7a66" ' + SW + '/><rect x="62" y="40" width="76" height="16" fill="#fff"/><circle cx="100" cy="100" r="24" fill="#ffd24d" ' + SW + '/><path d="M62 140h76M62 156h50" stroke="#fff" stroke-width="6" stroke-linecap="round"/>' },
+    { id: 'cleanbag', adv: true, name: '乾淨的塑膠袋', bin: 'recycle', why: '乾淨的塑膠袋可以回收，沾到髒東西就不行。',
+      svg: '<path d="M58 68h84l12 104H46z" fill="#eaf3fb" ' + SW + '/><path d="M80 68c0-36 40-36 40 0" fill="none" ' + SW + '/><path d="M70 100h60M66 130h68" stroke="#8fb6d9" stroke-width="5" stroke-linecap="round"/>' },
+    { id: 'foam', adv: true, name: '乾淨的保麗龍', bin: 'recycle', why: '乾淨的保麗龍可以回收，要先把髒東西清掉。',
+      svg: '<path d="M30 74L100 44L170 74V150L100 180L30 150Z" fill="#fff" ' + SW + '/><path d="M30 74L100 104L170 74M100 104V180" fill="none" ' + SW + '/><circle cx="62" cy="108" r="4" fill="#cfd4dc"/><circle cx="140" cy="108" r="4" fill="#cfd4dc"/><circle cx="74" cy="132" r="4" fill="#cfd4dc"/><circle cx="130" cy="140" r="4" fill="#cfd4dc"/>' },
+    { id: 'orange', adv: true, name: '橘子皮', bin: 'food', why: '水果的皮是廚餘。',
+      svg: '<path d="M30 110C30 60 70 36 100 36s70 24 70 74c0 30-30 56-70 56s-70-26-70-56z" fill="#f59f00" ' + SW + '/><path d="M54 112C54 80 76 64 100 64s46 16 46 48c0 20-20 36-46 36s-46-16-46-36z" fill="#fff3d6"/><path d="M100 64v84M54 112h92M66 82l68 60M134 82L66 142" stroke="#f59f00" stroke-width="4"/>' },
+    { id: 'tea', adv: true, name: '茶葉渣', bin: 'food', why: '泡過的茶葉渣是廚餘。',
+      svg: '<path d="M100 66V28" ' + SW + '/><rect x="86" y="14" width="28" height="22" fill="#f2efe4" ' + SW + '/><path d="M54 66h92l-8 96H62z" fill="#a8844f" ' + SW + '/><path d="M72 96l20 8M110 90l22 10M80 126l24 8M114 122l18 6" stroke="#6b4a1f" stroke-width="6" stroke-linecap="round"/>' },
+    { id: 'coffee', adv: true, name: '咖啡渣', bin: 'food', why: '咖啡渣是廚餘。',
+      svg: '<path d="M30 160C40 104 66 76 100 76s60 28 70 84z" fill="#6b4a2f" ' + SW + '/><path d="M60 120l10 4M100 100l10 4M130 128l10 4M84 142l10 4" stroke="#3b2a1a" stroke-width="6" stroke-linecap="round"/><path d="M62 40h76l-14 36H76z" fill="#f2efe4" ' + SW + '/>' },
+    { id: 'root', adv: true, name: '菜根', bin: 'food', why: '菜根和菜梗是廚餘。',
+      svg: '<path d="M100 28c34 8 48 52 36 86l-20 40h-32l-20-40C52 80 66 36 100 28z" fill="#cfe8a8" ' + SW + '/><path d="M100 40v100M78 70l22 22M122 70l-22 22" fill="none" stroke="#8cb860" stroke-width="5" stroke-linecap="round"/><path d="M92 154v28M102 154v34M112 154v24" stroke="#a0652a" stroke-width="6" stroke-linecap="round"/>' },
+    { id: 'melon', adv: true, name: '西瓜皮', bin: 'food', why: '西瓜皮是廚餘。',
+      svg: '<path d="M26 82a74 74 0 0 0 148 0z" fill="#3b9a45" ' + SW + '/><path d="M40 82a60 60 0 0 0 120 0z" fill="#f2efe4"/><path d="M54 82a46 46 0 0 0 92 0z" fill="#ee5a5a"/><ellipse cx="86" cy="104" rx="4" ry="6" fill="#1b1b1b"/><ellipse cx="114" cy="104" rx="4" ry="6" fill="#1b1b1b"/><ellipse cx="100" cy="122" rx="4" ry="6" fill="#1b1b1b"/>' },
+    { id: 'bowl', adv: true, name: '破掉的碗盤', bin: 'trash', why: '陶瓷碗盤不能回收，包好再丟一般垃圾，小心割手。',
+      svg: '<path d="M26 82h148c0 46-32 78-74 78S26 128 26 82z" fill="#f2efe4" ' + SW + '/><path d="M26 98h148" stroke="#5b8bd9" stroke-width="10"/><path d="M110 82l-12 28 16 14-14 32" fill="none" stroke="#1b1b1b" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/><path d="M138 164l16 14M60 168l-12 12" stroke="#1b1b1b" stroke-width="5" stroke-linecap="round"/>' },
+    { id: 'brush', adv: true, name: '牙刷', bin: 'trash', why: '牙刷由塑膠和刷毛做成，不能回收，丟一般垃圾。',
+      svg: '<g transform="rotate(-35 100 100)"><rect x="24" y="88" width="112" height="24" rx="12" fill="#5b8bd9" ' + SW + '/><rect x="130" y="82" width="46" height="36" rx="6" fill="#fff" ' + SW + '/><path d="M140 82V62M152 82V62M164 82V62" stroke="#ee7a66" stroke-width="7" stroke-linecap="round"/></g>' },
+    { id: 'pen', adv: true, name: '原子筆', bin: 'trash', why: '原子筆有好幾種材料，不能回收，丟一般垃圾。',
+      svg: '<g transform="rotate(-40 100 100)"><rect x="24" y="86" width="124" height="28" rx="9" fill="#2b6fc4" ' + SW + '/><rect x="24" y="86" width="26" height="28" rx="9" fill="#1b1b1b"/><path d="M148 86l32 14-32 14z" fill="#f3d9a8" ' + SW + '/></g>' },
+    { id: 'diaper', adv: true, name: '用過的尿布', bin: 'trash', why: '用過的尿布丟一般垃圾。',
+      svg: '<path d="M26 64h148v36c0 44-32 74-74 74s-74-30-74-74z" fill="#fff" ' + SW + '/><path d="M26 80h30M174 80h-30" stroke="#5b8bd9" stroke-width="9" stroke-linecap="round"/><path d="M70 126c20 12 40 12 60 0" fill="none" stroke="#b8bcc2" stroke-width="6" stroke-linecap="round"/>' },
+    { id: 'dirtybag', adv: true, name: '沾到油的塑膠袋', bin: 'trash', why: '沾到油的塑膠袋髒了，不能回收，丟一般垃圾。',
+      svg: '<path d="M58 68h84l12 104H46z" fill="#e8d9b0" ' + SW + '/><path d="M80 68c0-36 40-36 40 0" fill="none" ' + SW + '/><ellipse cx="86" cy="112" rx="14" ry="10" fill="#a0652a" opacity="0.6"/><ellipse cx="124" cy="140" rx="16" ry="11" fill="#a0652a" opacity="0.6"/>' },
+    { id: 'eraser', adv: true, name: '橡皮擦', bin: 'trash', why: '橡皮擦不能回收，丟一般垃圾。',
+      svg: '<g transform="rotate(-20 100 100)"><rect x="32" y="66" width="136" height="68" rx="12" fill="#fff" ' + SW + '/><rect x="32" y="66" width="52" height="68" rx="12" fill="#ee7a66" ' + SW + '/><path d="M84 66v68" stroke="#1b1b1b" stroke-width="5"/></g>' }
   ];
   var BY_ID = {};
   ITEMS.forEach(function (it) { BY_ID[it.id] = it; });
@@ -315,18 +349,27 @@ a.link { color: var(--accent); font-size: 20px; }
     { id: 's10', q: '把洗乾淨的寶特瓶丟進資源回收桶', r: 'recycle', why: '瓶子會變成新的東西再使用，這是回收。' },
     { id: 's11', q: '把看完的舊報紙綁好，拿去回收', r: 'recycle', why: '紙可以做成再生紙，這是回收。' },
     { id: 's12', q: '把喝完的鋁罐壓扁，再拿去回收', r: 'recycle', why: '鋁罐可以熔化再做成新的罐子，這是回收。' }
+    ,{ id: 's13', adv: true, q: '路邊有人發免費傳單，你說：「我不需要，謝謝」', r: 'refuse', why: '不拿用不到的東西，就不會變成垃圾，這是拒絕。' },
+    { id: 's14', adv: true, q: '朋友送你很多用不到的小贈品，你說：「不用了」', r: 'refuse', why: '一開始就不收用不到的東西，是拒絕。' },
+    { id: 's15', adv: true, q: '買東西以前，先想一想是不是真的需要', r: 'reduce', why: '少買不需要的東西，垃圾就變少，這是減量。' },
+    { id: 's16', adv: true, q: '買剛好吃得完的食物份量', r: 'reduce', why: '不浪費食物，廚餘就變少，這是減量。' },
+    { id: 's17', adv: true, q: '把空的果醬罐洗乾淨，拿來裝鉛筆', r: 'reuse', why: '罐子換個方式繼續用，是重複使用。' },
+    { id: 's18', adv: true, q: '和同學交換看完的故事書', r: 'reuse', why: '書給別人繼續看，是重複使用。' },
+    { id: 's19', adv: true, q: '把穿舊的衣服剪成抹布', r: 'reuse', why: '舊東西換個用途再用，是重複使用。' },
+    { id: 's20', adv: true, q: '把用完的雜誌綁好，拿去回收', r: 'recycle', why: '紙可以做成再生紙，這是回收。' },
+    { id: 's21', adv: true, q: '把洗乾淨的玻璃瓶，放進資源回收桶', r: 'recycle', why: '玻璃可以熔化，再做成新的瓶子，這是回收。' }
   ];
   var SC_BY = {};
   SCEN.forEach(function (s) { SC_BY['r4_' + s.id] = s; });
 
   /* ---------- games ---------- */
   var GAMES = [
-    { id: 'mix', name: '綜合', how: '每人 6 題，分類、對或錯、4R 情境混在一起，要看清楚題目喔！' },
-  { id: 'sort', name: '分類', how: '每人 3 題。把物品拖進正確的桶子。' },
-    { id: 'belt', name: '輸送帶', how: '30 秒內，把輸送帶上的垃圾拖進正確的桶子，別讓它掉下去！' },
-    { id: 'find', name: '找出放錯的', how: '桶子裡有幾件放錯了，點出來幫它搬家。猜錯 3 次就結束。' },
-    { id: 'tf', name: '對或錯', how: '每人 5 題。看看這句話說得對不對。' },
-    { id: 'r4', name: '4R 情境', how: '每人 3 題。選出這是哪一種 R。' }
+    { id: 'mix', name: '綜合', how: function (a) { return '每人 ' + (a ? 8 : 6) + ' 題，分類、對或錯、4R 情境混在一起，要看清楚題目喔！'; } },
+    { id: 'sort', name: '分類', how: function (a) { return '每人 ' + (a ? 4 : 3) + ' 題。把物品拖進正確的桶子。'; } },
+    { id: 'belt', name: '輸送帶', how: function (a) { return '30 秒內，把輸送帶上的垃圾拖進正確的桶子，別讓它掉下去！' + (a ? '進階的速度更快喔。' : ''); } },
+    { id: 'find', name: '找出放錯的', how: function (a) { return '桶子裡有 ' + (a ? 4 : 3) + ' 件放錯了，點出來幫它搬家。猜錯 3 次就結束。'; } },
+    { id: 'tf', name: '對或錯', how: function (a) { return '每人 ' + (a ? 6 : 5) + ' 題。看看這句話說得對不對。'; } },
+    { id: 'r4', name: '4R 情境', how: function (a) { return '每人 ' + (a ? 4 : 3) + ' 題。選出這是哪一種 R。'; } }
   ];
   function gameOf(id) { for (var i = 0; i < GAMES.length; i++) if (GAMES[i].id === id) return GAMES[i]; return GAMES[0]; }
 
@@ -410,13 +453,16 @@ a.link { color: var(--accent); font-size: 20px; }
   // a belt round cannot resume mid-run; anything half-finished from an old session restarts at "ready"
   if (st.screen === 'play' && st.cur && st.cur.kind === 'belt') st.screen = 'ready';
   if ((st.screen === 'play' || st.screen === 'feedback') && !(st.cur && st.cur.kind)) st.screen = st.players.length ? 'ready' : 'setup';
-  var cfg = Object.assign({ game: 'sort', coop: false, goal: 40 }, lsGet(LSC) || {});
+  var cfg = Object.assign({ game: 'sort', level: 'basic', coop: false, goal: 40 }, lsGet(LSC) || {});
   function save() { lsSet(LS, st); }
   var db = null, dbState = 'pending', net = 'solo', wroteOk = false;
   var unsubOwn = null, unsubCfg = null, unsubTotals = null, classTotal = 0;
 
+  function isAdv() { return cfg.level === 'adv'; }
+  function pool() { return isAdv() ? ITEMS : ITEMS.filter(function (i) { return !i.adv; }); }
+  function scenPool() { return isAdv() ? SCEN : SCEN.filter(function (c) { return !c.adv; }); }
   function nextItem() {
-    if (!st.queue.length) st.queue = shuffle(ITEMS.map(function (i) { return i.id; }));
+    if (st.qLevel !== cfg.level || !st.queue.length) { st.queue = shuffle(pool().map(function (i) { return i.id; })); st.qLevel = cfg.level; }
     return st.queue.shift();
   }
 
@@ -445,6 +491,7 @@ a.link { color: var(--accent); font-size: 20px; }
       if (s.exists) {
         var d = s.data() || {};
         if (typeof d.game === 'string') cfg.game = d.game;
+        if (d.level === 'adv' || d.level === 'basic') cfg.level = d.level;
         cfg.coop = !!d.coop;
         if (typeof d.goal === 'number') cfg.goal = d.goal;
       }
@@ -460,7 +507,7 @@ a.link { color: var(--accent); font-size: 20px; }
   }
   function setCfg(p) {
     Object.assign(cfg, p);
-    if (db) db.doc('config/class').set({ game: cfg.game, coop: !!cfg.coop, goal: cfg.goal }).catch(function () { });
+    if (db) db.doc('config/class').set({ game: cfg.game, level: cfg.level, coop: !!cfg.coop, goal: cfg.goal }).catch(function () { });
     else lsSet(LSC, cfg);
     repaintCfg();
   }
@@ -470,7 +517,7 @@ a.link { color: var(--accent); font-size: 20px; }
       paintTop(); paintCoop();
       if (st.screen === 'ready') render();
       var gn = document.getElementById('gamenote');
-      if (gn) gn.textContent = '玩法由老師在計分板選擇，現在是「' + gameOf(cfg.game).name + '」。';
+      if (gn) gn.textContent = '玩法由老師在計分板選擇，現在是「' + gameOf(cfg.game).name + (isAdv() ? '・進階' : '') + '」。';
     }
   }
 
@@ -484,9 +531,9 @@ a.link { color: var(--accent); font-size: 20px; }
   function makeScene() {
     var used = {}, cols = { recycle: [], food: [], trash: [] }, wrong = [];
     BIN_ORDER.forEach(function (b) {
-      shuffle(ITEMS.filter(function (i) { return i.bin === b; })).slice(0, 2).forEach(function (i) { cols[b].push(i.id); used[i.id] = 1; });
+      shuffle(pool().filter(function (i) { return i.bin === b; })).slice(0, 2).forEach(function (i) { cols[b].push(i.id); used[i.id] = 1; });
     });
-    shuffle(ITEMS.filter(function (i) { return !used[i.id]; })).slice(0, 3).forEach(function (i) {
+    shuffle(pool().filter(function (i) { return !used[i.id]; })).slice(0, isAdv() ? 4 : 3).forEach(function (i) {
       var where = pick(BIN_ORDER.filter(function (b) { return b !== i.bin; }));
       cols[where].push(i.id); wrong.push(i.id);
     });
@@ -498,17 +545,17 @@ a.link { color: var(--accent); font-size: 20px; }
     st.game = g; st.turnPts = 0; st.turnLog = []; st.turnSkipped = 0; st.last = null;
     if (g === 'sort') {
       var ids = [];
-      while (ids.length < 3) { var n = nextItem(); if (ids.indexOf(n) < 0) ids.push(n); }
-      st.cur = { kind: 'sort', n: 3, q: 0, ids: ids };
+      while (ids.length < (isAdv() ? 4 : 3)) { var n = nextItem(); if (ids.indexOf(n) < 0) ids.push(n); }
+      st.cur = { kind: 'sort', n: ids.length, q: 0, ids: ids };
     } else if (g === 'tf') {
-      st.cur = { kind: 'tf', n: 5, q: 0, qs: shuffle(ITEMS).slice(0, 5).map(function (it) {
+      st.cur = { kind: 'tf', n: isAdv() ? 6 : 5, q: 0, qs: shuffle(pool()).slice(0, isAdv() ? 6 : 5).map(function (it) {
         var truth = Math.random() < 0.5;
         return { id: it.id, shown: truth ? it.bin : pick(BIN_ORDER.filter(function (b) { return b !== it.bin; })) };
       }) };
     } else if (g === 'r4') {
-      st.cur = { kind: 'r4', n: 3, q: 0, rids: shuffle(SCEN).slice(0, 3).map(function (s) { return s.id; }) };
+      st.cur = { kind: 'r4', n: isAdv() ? 4 : 3, q: 0, rids: shuffle(scenPool()).slice(0, isAdv() ? 4 : 3).map(function (s) { return s.id; }) };
     } else if (g === 'mix') {
-      var N = 6, types = shuffle(['sort', 'sort', 'tf', 'tf', 'r4', 'r4']), its = shuffle(ITEMS), sc = shuffle(SCEN), ii = 0, ri = 0;
+      var N = isAdv() ? 8 : 6, types = shuffle(isAdv() ? ['sort', 'sort', 'sort', 'tf', 'tf', 'tf', 'r4', 'r4'] : ['sort', 'sort', 'tf', 'tf', 'r4', 'r4']), its = shuffle(pool()), sc = shuffle(scenPool()), ii = 0, ri = 0;
       var c = { kind: types[0], n: N, q: 0, types: types, ids: [], qs: [], rids: [] };
       types.forEach(function (t) {
         if (t === 'r4') { c.rids.push(sc[ri++].id); c.ids.push(null); c.qs.push(null); }
@@ -559,7 +606,7 @@ a.link { color: var(--accent); font-size: 20px; }
     return [
       g != null && h('div', { class: 'chip', style: 'background:' + gcolor(g) }, '第 ' + g + ' 組'),
       g != null && h('div', { class: 'score' }, '總分 ', h('b', {}, st.points)),
-      g != null && h('div', { class: 'gamepill' }, '玩法：' + gameOf(cfg.game).name),
+      g != null && h('div', { class: 'gamepill' }, '玩法：' + gameOf(cfg.game).name + (isAdv() ? '・進階' : '')),
       h('div', { class: 'grow' }),
       h('span', { class: 'status', role: 'status' }, statusText()),
       h('button', { class: 'btn-sm', onclick: function () { st.sound = !st.sound; save(); paintTop(); }, 'aria-pressed': String(st.sound) }, st.sound ? '聲音：開' : '聲音：關'),
@@ -585,6 +632,11 @@ a.link { color: var(--accent); font-size: 20px; }
       return h('button', { class: 'seg', 'aria-pressed': String(cfg.game === g.id), onclick: function () { onPick(g.id); } }, g.name);
     }));
   }
+  function levelChooser(onPick) {
+    return h('div', { class: 'row', role: 'group', 'aria-label': '選擇難度' }, [['basic', '基礎'], ['adv', '進階']].map(function (l) {
+      return h('button', { class: 'seg', 'aria-pressed': String(cfg.level === l[0]), onclick: function () { onPick(l[0]); } }, l[1]);
+    }));
+  }
   function setupView() {
     var count = st.setupCount || 4;
     var picked = st.group;
@@ -597,8 +649,8 @@ a.link { color: var(--accent); font-size: 20px; }
     var gameBox = h('div', {});
     function paintGame() {
       if (dbState === 'pending') { gameBox.replaceChildren(); return; }
-      if (db) gameBox.replaceChildren(h('p', { class: 'note', id: 'gamenote' }, '玩法由老師在計分板選擇，現在是「' + gameOf(cfg.game).name + '」。'));
-      else gameBox.replaceChildren(h('h2', {}, '玩法'), gameChooser(function (id) { setCfg({ game: id }); paintGame(); }));
+      if (db) gameBox.replaceChildren(h('p', { class: 'note', id: 'gamenote' }, '玩法由老師在計分板選擇，現在是「' + gameOf(cfg.game).name + (isAdv() ? '・進階' : '') + '」。'));
+      else gameBox.replaceChildren(h('h2', {}, '玩法'), gameChooser(function (id) { setCfg({ game: id }); paintGame(); }), h('h2', {}, '難度'), levelChooser(function (l) { setCfg({ level: l }); paintGame(); }));
     }
     function paintGroups() {
       gwrap.replaceChildren.apply(gwrap, GROUPS.map(function (c, i) {
@@ -643,7 +695,7 @@ a.link { color: var(--accent); font-size: 20px; }
     return h('main', {}, h('div', { class: 'center' },
       h('span', { class: 'pill' }, '第 ' + st.round + ' 輪・第 ' + (st.turn + 1) + ' 位・' + g.name),
       h('h1', {}, '輪到 ' + p.name + '！'),
-      h('p', { class: 'sub' }, g.how),
+      h('p', { class: 'sub' }, g.how(isAdv())),
       h('p', { class: 'sub' }, '把平板交給 ' + p.name + '，準備好了就按下面的按鈕。'),
       h('button', { class: 'btn-big', onclick: startTurn }, '我準備好了')
     ));
@@ -820,7 +872,7 @@ a.link { color: var(--accent); font-size: 20px; }
       if (!belt || belt.over) return;
       var dt = Math.min(0.05, (t - belt.last) / 1000); belt.last = t;
       var el = (t - belt.t0) / 1000, remain = Math.max(0, 30 - el), W = lane.clientWidth;
-      var v = 95 + 4 * el;
+      var v = (isAdv() ? 125 : 95) + 4 * el;
       if (belt.items.length < 6 && belt.items.every(function (o) { return o.drag || o.x > 235; })) spawn(W);
       belt.items.slice().forEach(function (o) {
         if (o.drag) return;
@@ -952,6 +1004,10 @@ a.link { color: var(--accent); font-size: 20px; }
     if (!isManual && dbState === 'ready') {
       kids.push(h('span', { class: 'lab' }, '目前玩法'));
       GAMES.forEach(function (g) { kids.push(h('button', { class: 'seg', 'aria-pressed': String(cfg.game === g.id), onclick: function () { setCfg({ game: g.id }); } }, g.name)); });
+    }
+    if (!isManual && dbState === 'ready') {
+      kids.push(h('span', { class: 'lab' }, '難度'));
+      [['basic', '基礎'], ['adv', '進階']].forEach(function (l) { kids.push(h('button', { class: 'seg', 'aria-pressed': String(cfg.level === l[0]), onclick: function () { setCfg({ level: l[0] }); } }, l[1])); });
     }
     kids.push(h('span', { class: 'lab' }, '模式'));
     kids.push(h('button', { class: 'seg', 'aria-pressed': String(!cfg.coop), onclick: function () { setCfg({ coop: false }); } }, '各組競賽'));
