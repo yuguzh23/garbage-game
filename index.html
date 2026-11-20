@@ -197,8 +197,8 @@ a.link { color: var(--accent); font-size: 20px; }
 .result .q { font-size: 24px; color: var(--ink2); }
 .sumlist { display: grid; grid-template-columns: repeat(auto-fill, minmax(330px, 1fr)); gap: 8px 24px; width: 100%; text-align: left; }
 .center .result:has(.sumlist) { max-width: 1100px; }
-.sumrow { display: grid; grid-template-columns: 70px 1fr; gap: 14px; align-items: center; font-size: 24px; line-height: 1.4; }
-.sumrow .mini { width: 70px; height: 70px; border-radius: 16px; padding: 4px; }
+.sumrow { display: grid; grid-template-columns: 56px 1fr; gap: 12px; align-items: center; font-size: 22px; line-height: 1.4; }
+.sumrow .mini { width: 56px; height: 56px; border-radius: 16px; padding: 4px; }
 .confetti { position: fixed; inset: 0; pointer-events: none; overflow: hidden; z-index: 30; }
 .confetti i { position: absolute; top: -24px; width: 14px; height: 20px; border-radius: 3px; animation: fall 1.7s ease-in forwards; }
 @keyframes fall { to { transform: translate(var(--dx), 110vh) rotate(var(--r)); } }
@@ -1127,7 +1127,7 @@ a.link { color: var(--accent); font-size: 20px; }
       h('span', { class: 'pill' }, gameOf(st.game).name),
       h('h1', {}, p.name + ' 得到 ' + st.turnPts + ' 分'),
       st.turnSkipped ? h('p', { class: 'sub' }, '漏掉了 ' + st.turnSkipped + ' 件，下次加油！') : null,
-      wrong.length ? h('div', { class: 'result no' }, h('p', { class: 'why' }, '這些要記住：'), h('div', { class: 'sumlist' }, wrong.map(sumRow)))
+      wrong.length ? h('div', { class: 'result no' }, h('p', { class: 'why' }, '這些要記住：'), h('div', { class: 'sumlist' }, wrong.slice(0, 6).map(sumRow)), wrong.length > 6 ? h('p', { class: 'sub' }, '還有 ' + (wrong.length - 6) + ' 題，老師的畫面可以看到') : null)
         : h('p', { class: 'sub' }, st.turnLog.length ? '全部答對，太棒了！' : '下一位加油！'),
       h('button', { class: 'btn-big', onclick: function () {
         st.cur = null; st.last = null;
