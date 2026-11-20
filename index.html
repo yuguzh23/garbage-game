@@ -40,10 +40,6 @@
   color-scheme: dark;
 }
 * { box-sizing: border-box; }
-.rot { position: fixed; inset: 0; z-index: 99; display: none; flex-direction: column; align-items: center; justify-content: center; gap: 16px; background: var(--bg, #eceee9); color: var(--fg, #1f2a24); text-align: center; font-size: 26px; font-weight: 700; padding: 24px; }
-.rot .ic { font-size: 84px; display: inline-block; animation: rotp 2.2s ease-in-out infinite; }
-@keyframes rotp { 0%,30% { transform: rotate(0); } 70%,100% { transform: rotate(-90deg); } }
-body.portrait .rot { display: flex; }
 html, body { touch-action: pan-x pan-y; -webkit-tap-highlight-color: transparent; }
 button { touch-action: manipulation; -webkit-user-select: none; user-select: none; }
 body {
@@ -690,15 +686,6 @@ a.link { color: var(--accent); font-size: 20px; }
     if (st.turnPts >= 3) { good(); confetti(); }
   }
 
-  /* ---------- landscape hint (tablet view only) ---------- */
-  var rotEl = null;
-  function orient() {
-    if (isBoard()) { document.body.classList.remove('portrait'); return; }
-    if (!rotEl) { rotEl = document.createElement('div'); rotEl.className = 'rot'; rotEl.innerHTML = '<div class="ic">📱</div><div>請把平板橫過來玩</div><div style="font-size:18px;font-weight:400;opacity:.7">橫向畫面比較好操作</div>'; document.body.appendChild(rotEl); try { screen.orientation.lock('landscape').catch(function () { }); } catch (e) { } }
-    document.body.classList.toggle('portrait', window.innerHeight > window.innerWidth);
-  }
-  window.addEventListener('resize', orient); window.addEventListener('orientationchange', orient);
-
   /* ---------- top bar ---------- */
   var root = document.getElementById('app');
   function statusText() {
@@ -1301,7 +1288,6 @@ a.link { color: var(--accent); font-size: 20px; }
       root.replaceChildren.apply(root, tabletView());
       paintCoop();
     }
-    orient();
   }
   window.addEventListener('hashchange', function () { stopBoard(); render(); });
 
