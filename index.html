@@ -41,6 +41,10 @@
 }
 * { box-sizing: border-box; }
 body.fit { overflow: hidden; }
+.rot { position: fixed; inset: 0; z-index: 99; display: none; flex-direction: column; align-items: center; justify-content: center; gap: 16px; background: var(--bg, #eceee9); color: var(--fg, #1f2a24); text-align: center; font-size: 26px; font-weight: 700; padding: 24px; }
+.rot .ic { font-size: 84px; display: inline-block; animation: rotp 2.2s ease-in-out infinite; }
+@keyframes rotp { 0%,30% { transform: rotate(0); } 70%,100% { transform: rotate(-90deg); } }
+body.portrait .rot { display: flex; }
 html, body { touch-action: pan-x pan-y; -webkit-tap-highlight-color: transparent; }
 button { touch-action: manipulation; -webkit-user-select: none; user-select: none; }
 body {
@@ -668,10 +672,12 @@ a.link { color: var(--accent); font-size: 20px; }
   }
 
   /* ---------- fit the tablet page to the screen: no vertical scrolling ---------- */
-  var Z = 1, fitTimer = 0;
+  var Z = 1, fitTimer = 0, rotEl = null;
   function fit() {
-    if (isBoard()) { document.body.classList.remove('fit'); root.style.zoom = ''; root.style.minHeight = ''; Z = 1; return; }
+    if (isBoard()) { document.body.classList.remove('fit'); document.body.classList.remove('portrait'); root.style.zoom = ''; root.style.minHeight = ''; Z = 1; return; }
     document.body.classList.add('fit');
+    document.body.classList.toggle('portrait', window.innerHeight > window.innerWidth);
+    if (!rotEl) { rotEl = document.createElement('div'); rotEl.className = 'rot'; rotEl.innerHTML = '<div class="ic">📱</div><div>請把平板橫過來玩</div><div style="font-size:18px;font-weight:400;opacity:.7">橫向畫面比較好操作</div>'; document.body.appendChild(rotEl); try { screen.orientation.lock('landscape').catch(function () { }); } catch (e) { } }
     var cs = getComputedStyle(document.body), hs = getComputedStyle(document.documentElement);
     var avail = window.innerHeight - (parseFloat(cs.paddingTop) || 0) - (parseFloat(cs.paddingBottom) || 0) - (parseFloat(hs.paddingTop) || 0) - (parseFloat(hs.paddingBottom) || 0);
     var z = 1;
