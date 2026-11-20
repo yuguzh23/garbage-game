@@ -559,9 +559,9 @@ a.link { color: var(--accent); font-size: 20px; }
     unsubOwn = db.doc('scores/g' + st.group).onSnapshot(function (s) {
       // the teacher reset the board: start this tablet's score again from zero
       if (!s.exists && wroteOk && !s.metadata.hasPendingWrites && !s.metadata.fromCache && st.played > 0) {
-        st.points = 0; st.played = 0; st.correct = 0; st.misses = {}; st.round = 1; st.turn = 0;
+        st.points = 0; st.played = 0; st.correct = 0; st.misses = {};
         st.players.forEach(function (p) { p.points = 0; });
-        st.screen = 'ready'; save(); render();
+        save(); render();
       }
     }, function () { });
   }
@@ -593,9 +593,9 @@ a.link { color: var(--accent); font-size: 20px; }
     if (st.seenReset == null) { st.seenReset = cfg.resetAt; changed = true; }
     else if (cfg.resetAt && cfg.resetAt !== st.seenReset) {
       st.seenReset = cfg.resetAt; changed = true;
-      st.points = 0; st.played = 0; st.correct = 0; st.misses = {}; st.round = 1; st.turn = 0; st.queue = []; st.cur = null; st.last = null; st.turnPts = 0; st.turnLog = []; st.turnSkipped = 0;
+      // only the scores go back to zero; round, player and the current screen stay where they are
+      st.points = 0; st.played = 0; st.correct = 0; st.misses = {}; st.turnPts = 0;
       st.players.forEach(function (p) { p.points = 0; });
-      st.screen = st.players.length ? 'ready' : 'setup';
       sync(); render();
     }
     if (st.seenHome == null) { st.seenHome = cfg.homeAt; changed = true; }
