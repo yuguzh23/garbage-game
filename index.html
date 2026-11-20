@@ -40,7 +40,6 @@
   color-scheme: dark;
 }
 * { box-sizing: border-box; }
-body.fit { overflow: hidden; }
 .rot { position: fixed; inset: 0; z-index: 99; display: none; flex-direction: column; align-items: center; justify-content: center; gap: 16px; background: var(--bg, #eceee9); color: var(--fg, #1f2a24); text-align: center; font-size: 26px; font-weight: 700; padding: 24px; }
 .rot .ic { font-size: 84px; display: inline-block; animation: rotp 2.2s ease-in-out infinite; }
 @keyframes rotp { 0%,30% { transform: rotate(0); } 70%,100% { transform: rotate(-90deg); } }
@@ -195,10 +194,9 @@ a.link { color: var(--accent); font-size: 20px; }
 .mini svg { width: 100%; height: 100%; }
 .result .why { font-size: clamp(22px, 3vw, 30px); max-width: 30em; }
 .result .q { font-size: 24px; color: var(--ink2); }
-.sumlist { display: grid; grid-template-columns: repeat(auto-fill, minmax(330px, 1fr)); gap: 8px 24px; width: 100%; text-align: left; }
-.center .result:has(.sumlist) { max-width: 1100px; }
-.sumrow { display: grid; grid-template-columns: 56px 1fr; gap: 12px; align-items: center; font-size: 22px; line-height: 1.4; }
-.sumrow .mini { width: 56px; height: 56px; border-radius: 16px; padding: 4px; }
+.sumlist { display: flex; flex-direction: column; gap: 8px; width: 100%; text-align: left; }
+.sumrow { display: grid; grid-template-columns: 70px 1fr; gap: 14px; align-items: center; font-size: 24px; line-height: 1.4; }
+.sumrow .mini { width: 70px; height: 70px; border-radius: 16px; padding: 4px; }
 .confetti { position: fixed; inset: 0; pointer-events: none; overflow: hidden; z-index: 30; }
 .confetti i { position: absolute; top: -24px; width: 14px; height: 20px; border-radius: 3px; animation: fall 1.7s ease-in forwards; }
 @keyframes fall { to { transform: translate(var(--dx), 110vh) rotate(var(--r)); } }
@@ -672,30 +670,14 @@ a.link { color: var(--accent); font-size: 20px; }
     if (st.turnPts >= 3) { good(); confetti(); }
   }
 
-  /* ---------- fit the tablet page to the screen: no vertical scrolling ---------- */
-  var Z = 1, fitTimer = 0, rotEl = null;
-  function fit() {
-    if (isBoard()) { document.body.classList.remove('fit'); document.body.classList.remove('portrait'); root.style.zoom = ''; root.style.minHeight = ''; Z = 1; return; }
-    document.body.classList.add('fit');
-    document.body.classList.toggle('portrait', window.innerHeight > window.innerWidth);
+  /* ---------- landscape hint (tablet view only) ---------- */
+  var rotEl = null;
+  function orient() {
+    if (isBoard()) { document.body.classList.remove('portrait'); return; }
     if (!rotEl) { rotEl = document.createElement('div'); rotEl.className = 'rot'; rotEl.innerHTML = '<div class="ic">📱</div><div>請把平板橫過來玩</div><div style="font-size:18px;font-weight:400;opacity:.7">橫向畫面比較好操作</div>'; document.body.appendChild(rotEl); try { screen.orientation.lock('landscape').catch(function () { }); } catch (e) { } }
-    var cs = getComputedStyle(document.body), hs = getComputedStyle(document.documentElement);
-    var avail = window.innerHeight - (parseFloat(cs.paddingTop) || 0) - (parseFloat(cs.paddingBottom) || 0) - (parseFloat(hs.paddingTop) || 0) - (parseFloat(hs.paddingBottom) || 0);
-    var z = 1;
-    for (var i = 0; i < 6; i++) {
-      root.style.zoom = z; root.style.minHeight = (avail / z) + 'px';
-      var need = root.offsetHeight * z;
-      if (need <= avail + 1) break;
-      z = Math.max(0.4, z * avail / need * 0.995);
-    }
-    Z = z; if (z === 1) root.style.zoom = '';
+    document.body.classList.toggle('portrait', window.innerHeight > window.innerWidth);
   }
-  function fitSoon() { cancelAnimationFrame(fitTimer); fitTimer = requestAnimationFrame(fit); }
-  window.addEventListener('resize', fitSoon);
-  window.addEventListener('orientationchange', fitSoon);
-  try { document.fonts.ready.then(fitSoon); } catch (e) { }
-  window.addEventListener('load', function () { setTimeout(fitSoon, 300); });
-  if (window.visualViewport) window.visualViewport.addEventListener('resize', fitSoon);
+  window.addEventListener('resize', orient); window.addEventListener('orientationchange', orient);
 
   /* ---------- top bar ---------- */
   var root = document.getElementById('app');
@@ -718,13 +700,13 @@ a.link { color: var(--accent); font-size: 20px; }
   }
   function paintTop() {
     var t = document.getElementById('top');
-    if (t) { t.replaceChildren.apply(t, topBar().filter(Boolean)); fitSoon(); }
+    if (t) t.replaceChildren.apply(t, topBar().filter(Boolean));
   }
   function paintCoop() {
     var c = document.getElementById('coop');
     if (!c) return;
-    if (!cfg.coop || !db) { c.replaceChildren(); c.hidden = true; fitSoon(); return; }
-    c.hidden = false; fitSoon();
+    if (!cfg.coop || !db) { c.replaceChildren(); c.hidden = true; return; }
+    c.hidden = false;
     var pct = Math.min(100, classTotal / Math.max(1, cfg.goal) * 100);
     c.replaceChildren(h('span', {}, '全班一起闖關'), h('div', { class: 'track', role: 'img', 'aria-label': '全班 ' + classTotal + ' 分，目標 ' + cfg.goal + ' 分' }, h('i', { style: 'width:' + pct + '%' })), h('span', {}, classTotal + ' / ' + cfg.goal + (classTotal >= cfg.goal ? '・過關！' : '')));
   }
@@ -828,7 +810,7 @@ a.link { color: var(--accent); font-size: 20px; }
     card.addEventListener('pointerdown', function (e) { on = true; sx = e.clientX; sy = e.clientY; card.setPointerCapture(e.pointerId); card.classList.add('drag'); });
     card.addEventListener('pointermove', function (e) {
       if (!on) return;
-      card.style.transform = 'translate(' + ((e.clientX - sx) / Z) + 'px,' + ((e.clientY - sy) / Z) + 'px) scale(.88)';
+      card.style.transform = 'translate(' + (e.clientX - sx) + 'px,' + (e.clientY - sy) + 'px) scale(.88)';
       mark(binAt(e));
     });
     function end(e, cancel) {
@@ -1015,7 +997,7 @@ a.link { color: var(--accent); font-size: 20px; }
       });
       el.addEventListener('pointermove', function (e) {
         if (!o.drag) return;
-        o.x = o.drag.ox + (e.clientX - o.drag.sx) / Z; o.y = o.drag.oy + (e.clientY - o.drag.sy) / Z;
+        o.x = o.drag.ox + e.clientX - o.drag.sx; o.y = o.drag.oy + e.clientY - o.drag.sy;
         var b = binAt(e);
         if (o.drag.hot && o.drag.hot !== b) o.drag.hot.classList.remove('hot');
         if (b) b.classList.add('hot');
@@ -1127,7 +1109,7 @@ a.link { color: var(--accent); font-size: 20px; }
       h('span', { class: 'pill' }, gameOf(st.game).name),
       h('h1', {}, p.name + ' 得到 ' + st.turnPts + ' 分'),
       st.turnSkipped ? h('p', { class: 'sub' }, '漏掉了 ' + st.turnSkipped + ' 件，下次加油！') : null,
-      wrong.length ? h('div', { class: 'result no' }, h('p', { class: 'why' }, '這些要記住：'), h('div', { class: 'sumlist' }, wrong.slice(0, 6).map(sumRow)), wrong.length > 6 ? h('p', { class: 'sub' }, '還有 ' + (wrong.length - 6) + ' 題，老師的畫面可以看到') : null)
+      wrong.length ? h('div', { class: 'result no' }, h('p', { class: 'why' }, '這些要記住：'), h('div', { class: 'sumlist' }, wrong.map(sumRow)))
         : h('p', { class: 'sub' }, st.turnLog.length ? '全部答對，太棒了！' : '下一位加油！'),
       h('button', { class: 'btn-big', onclick: function () {
         st.cur = null; st.last = null;
@@ -1292,7 +1274,7 @@ a.link { color: var(--accent); font-size: 20px; }
       root.replaceChildren.apply(root, tabletView());
       paintCoop();
     }
-    fit();
+    orient();
   }
   window.addEventListener('hashchange', function () { stopBoard(); render(); });
 
