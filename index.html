@@ -40,6 +40,7 @@
   color-scheme: dark;
 }
 * { box-sizing: border-box; }
+body.fit { overflow: hidden; }
 html, body { touch-action: pan-x pan-y; -webkit-tap-highlight-color: transparent; }
 button { touch-action: manipulation; -webkit-user-select: none; user-select: none; }
 body {
@@ -666,6 +667,26 @@ a.link { color: var(--accent); font-size: 20px; }
     if (st.turnPts >= 3) { good(); confetti(); }
   }
 
+  /* ---------- fit the tablet page to the screen: no vertical scrolling ---------- */
+  var Z = 1, fitTimer = 0;
+  function fit() {
+    if (isBoard()) { document.body.classList.remove('fit'); root.style.zoom = ''; root.style.minHeight = ''; Z = 1; return; }
+    document.body.classList.add('fit');
+    var cs = getComputedStyle(document.body), hs = getComputedStyle(document.documentElement);
+    var avail = window.innerHeight - (parseFloat(cs.paddingTop) || 0) - (parseFloat(cs.paddingBottom) || 0) - (parseFloat(hs.paddingTop) || 0) - (parseFloat(hs.paddingBottom) || 0);
+    var z = 1;
+    for (var i = 0; i < 6; i++) {
+      root.style.zoom = z; root.style.minHeight = (avail / z) + 'px';
+      var need = root.offsetHeight * z;
+      if (need <= avail + 1) break;
+      z = Math.max(0.4, z * avail / need * 0.995);
+    }
+    Z = z; if (z === 1) root.style.zoom = '';
+  }
+  function fitSoon() { cancelAnimationFrame(fitTimer); fitTimer = requestAnimationFrame(fit); }
+  window.addEventListener('resize', fitSoon);
+  window.addEventListener('orientationchange', fitSoon);
+
   /* ---------- top bar ---------- */
   var root = document.getElementById('app');
   function statusText() {
@@ -687,13 +708,13 @@ a.link { color: var(--accent); font-size: 20px; }
   }
   function paintTop() {
     var t = document.getElementById('top');
-    if (t) t.replaceChildren.apply(t, topBar().filter(Boolean));
+    if (t) { t.replaceChildren.apply(t, topBar().filter(Boolean)); fitSoon(); }
   }
   function paintCoop() {
     var c = document.getElementById('coop');
     if (!c) return;
-    if (!cfg.coop || !db) { c.replaceChildren(); c.hidden = true; return; }
-    c.hidden = false;
+    if (!cfg.coop || !db) { c.replaceChildren(); c.hidden = true; fitSoon(); return; }
+    c.hidden = false; fitSoon();
     var pct = Math.min(100, classTotal / Math.max(1, cfg.goal) * 100);
     c.replaceChildren(h('span', {}, '全班一起闖關'), h('div', { class: 'track', role: 'img', 'aria-label': '全班 ' + classTotal + ' 分，目標 ' + cfg.goal + ' 分' }, h('i', { style: 'width:' + pct + '%' })), h('span', {}, classTotal + ' / ' + cfg.goal + (classTotal >= cfg.goal ? '・過關！' : '')));
   }
@@ -797,7 +818,7 @@ a.link { color: var(--accent); font-size: 20px; }
     card.addEventListener('pointerdown', function (e) { on = true; sx = e.clientX; sy = e.clientY; card.setPointerCapture(e.pointerId); card.classList.add('drag'); });
     card.addEventListener('pointermove', function (e) {
       if (!on) return;
-      card.style.transform = 'translate(' + (e.clientX - sx) + 'px,' + (e.clientY - sy) + 'px) scale(.88)';
+      card.style.transform = 'translate(' + ((e.clientX - sx) / Z) + 'px,' + ((e.clientY - sy) / Z) + 'px) scale(.88)';
       mark(binAt(e));
     });
     function end(e, cancel) {
@@ -984,7 +1005,7 @@ a.link { color: var(--accent); font-size: 20px; }
       });
       el.addEventListener('pointermove', function (e) {
         if (!o.drag) return;
-        o.x = o.drag.ox + e.clientX - o.drag.sx; o.y = o.drag.oy + e.clientY - o.drag.sy;
+        o.x = o.drag.ox + (e.clientX - o.drag.sx) / Z; o.y = o.drag.oy + (e.clientY - o.drag.sy) / Z;
         var b = binAt(e);
         if (o.drag.hot && o.drag.hot !== b) o.drag.hot.classList.remove('hot');
         if (b) b.classList.add('hot');
@@ -1261,6 +1282,7 @@ a.link { color: var(--accent); font-size: 20px; }
       root.replaceChildren.apply(root, tabletView());
       paintCoop();
     }
+    fit();
   }
   window.addEventListener('hashchange', function () { stopBoard(); render(); });
 
