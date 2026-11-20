@@ -537,7 +537,7 @@ a.link { color: var(--accent); font-size: 20px; }
   // a belt round cannot resume mid-run; anything half-finished from an old session restarts at "ready"
   if (st.screen === 'play' && st.cur && st.cur.kind === 'belt') st.screen = 'ready';
   if ((st.screen === 'play' || st.screen === 'feedback') && !(st.cur && st.cur.kind)) st.screen = st.players.length ? 'ready' : 'setup';
-  var cfg = Object.assign({ game: 'sort', level: 'basic', coop: false, goal: 40 }, lsGet(LSC) || {});
+  var cfg = Object.assign({ game: 'sort', level: 'basic', coop: false, goal: 40, resetAt: 0, homeAt: 0 }, lsGet(LSC) || {});
   function save() { lsSet(LS, st); }
   var db = null, dbState = 'pending', net = 'solo', wroteOk = false;
   var unsubOwn = null, unsubCfg = null, unsubTotals = null, classTotal = 0;
@@ -578,6 +578,8 @@ a.link { color: var(--accent); font-size: 20px; }
         if (d.level === 'adv' || d.level === 'basic') cfg.level = d.level;
         cfg.coop = !!d.coop;
         if (typeof d.goal === 'number') cfg.goal = d.goal;
+        cfg.resetAt = d.resetAt || 0; cfg.homeAt = d.homeAt || 0;
+        if (!isBoard()) handleSignals();
       }
       repaintCfg();
     }, function () { });
@@ -589,9 +591,27 @@ a.link { color: var(--accent); font-size: 20px; }
       paintCoop();
     }, function () { });
   }
+  /* teacher broadcasts: reset everyone's score (back to player 1) / send every tablet to the main screen */
+  function handleSignals() {
+    var changed = false;
+    if (st.seenReset == null) { st.seenReset = cfg.resetAt; changed = true; }
+    else if (cfg.resetAt && cfg.resetAt !== st.seenReset) {
+      st.seenReset = cfg.resetAt; changed = true;
+      st.points = 0; st.played = 0; st.correct = 0; st.misses = {}; st.round = 1; st.turn = 0; st.queue = []; st.cur = null; st.last = null; st.turnPts = 0; st.turnLog = []; st.turnSkipped = 0;
+      st.players.forEach(function (p) { p.points = 0; });
+      st.screen = st.players.length ? 'ready' : 'setup';
+      sync(); render();
+    }
+    if (st.seenHome == null) { st.seenHome = cfg.homeAt; changed = true; }
+    else if (cfg.homeAt && cfg.homeAt !== st.seenHome) {
+      st.seenHome = cfg.homeAt; changed = true;
+      st.cur = null; st.last = null; st.screen = 'setup'; render();
+    }
+    if (changed) save();
+  }
   function setCfg(p) {
     Object.assign(cfg, p);
-    if (db) db.doc('config/class').set({ game: cfg.game, level: cfg.level, coop: !!cfg.coop, goal: cfg.goal }).catch(function () { });
+    if (db) db.doc('config/class').set({ game: cfg.game, level: cfg.level, coop: !!cfg.coop, goal: cfg.goal, resetAt: cfg.resetAt || 0, homeAt: cfg.homeAt || 0 }).catch(function () { });
     else lsSet(LSC, cfg);
     repaintCfg();
   }
@@ -1231,6 +1251,7 @@ a.link { color: var(--accent); font-size: 20px; }
       h('div', { class: 'row' },
         h('span', { class: 'status' }, isManual ? '單機模式：請老師用 +、− 手動記分，玩法請各組在平板上選。' : (dbState === 'pending' ? '連線中…' : '即時連線中，各組答題後分數會自動更新。')),
         h('div', { class: 'grow' }),
+        (db && canReset) ? h('button', { class: 'btn-sm', onclick: goHome }, homeSent ? '已通知所有平板' : '全部回到主畫面') : null,
         canReset ? (confirming
           ? h('div', { class: 'confirm' }, h('span', {}, '確定要全部歸零嗎？'),
             h('button', { class: 'btn-sm', onclick: doReset }, '確定歸零'),
@@ -1243,11 +1264,17 @@ a.link { color: var(--accent); font-size: 20px; }
     var g = manual[n] || { group: n, points: 0, played: 0, correct: 0, misses: {} };
     g.points = Math.max(0, (g.points || 0) + d); manual[n] = g; lsSet(BM, manual); paintBoard();
   }
+  function goHome() {
+    if (!db) return;
+    cfg.homeAt = Date.now(); setCfg({}); homeSent = true; paintBoard();
+    setTimeout(function () { homeSent = false; paintBoard(); }, 2500);
+  }
+  var homeSent = false;
   function doReset() {
     confirming = false; prevTotal = null;
     if (!db) { manual = {}; lsSet(BM, manual); paintBoard(); return; }
     db.collection('scores').get().then(function (s) { return Promise.all(s.docs.map(function (d) { return db.doc('scores/' + d.id).delete(); })); })
-      .then(function () { live = {}; paintBoard(); }).catch(function () { paintBoard(); });
+      .then(function () { cfg.resetAt = Date.now(); setCfg({}); live = {}; paintBoard(); }).catch(function () { paintBoard(); });
   }
   function startBoard() {
     boardEl = h('div', { class: 'app', style: 'min-height:0' });
